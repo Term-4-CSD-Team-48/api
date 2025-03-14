@@ -1,0 +1,76 @@
+package com.term_4_csd__50_001.api._legacy;
+
+import java.io.IOException;
+import java.lang.reflect.Array;
+import java.util.Arrays;
+import org.springframework.security.authentication.AuthenticationServiceException;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.session.SessionRegistryImpl;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import com.term_4_csd__50_001.api.CustomAuthenticationManager;
+import com.term_4_csd__50_001.api.CustomAuthenticationToken;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.session.ConcurrentSessionControlAuthenticationStrategy;
+import org.springframework.security.web.authentication.session.SessionAuthenticationStrategy;
+
+public class CustomAuthenticationProcessingFilter extends AbstractAuthenticationProcessingFilter {
+
+    private static final AntPathRequestMatcher DEFAULT_ANT_PATH_REQUEST_MATCHER =
+            new AntPathRequestMatcher("/auth/login", "POST");
+
+    public CustomAuthenticationProcessingFilter(
+            CustomAuthenticationManager customAuthenticationManager) {
+        super(DEFAULT_ANT_PATH_REQUEST_MATCHER, customAuthenticationManager);
+        setAuthenticationSuccessHandler((_, _, _) -> {
+        });
+        setAuthenticationFailureHandler((_, _, _) -> {
+        });
+    }
+
+    @Override
+    public Authentication attemptAuthentication(HttpServletRequest request,
+            HttpServletResponse response)
+            throws AuthenticationException, IOException, ServletException {
+        System.out.println("Attempting authentication");
+        if (!request.getMethod().equals("POST")) {
+            throw new AuthenticationServiceException(
+                    "Authentication method not supported: " + request.getMethod());
+        }
+        String email = request.getParameter("email");
+        email = (email != null) ? email : "";
+        String rawPassword = request.getParameter("password");
+        rawPassword = (rawPassword != null) ? rawPassword : "";
+        CustomAuthenticationToken authRequest =
+                CustomAuthenticationToken.unauthenticated(email, rawPassword);
+        setDetails(request, authRequest);
+        CustomAuthenticationToken result = (CustomAuthenticationToken) this
+                .getAuthenticationManager().authenticate(authRequest);
+        if (result == null) {
+            System.out.println("attemptAuthentication returned null");
+        }
+        return result;
+    }
+
+    @Override
+    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
+            throws IOException, ServletException {
+        System.out.println("Doing filter CustomAuthenticationProcessingFilter");
+        System.out.println("Requires authentication: " + requiresAuthentication(
+                (HttpServletRequest) request, (HttpServletResponse) response));
+        System.out.println("allowSessionCreation: " + getAllowSessionCreation());
+        super.doFilter(request, response, chain);
+    }
+
+    protected void setDetails(HttpServletRequest request, CustomAuthenticationToken authRequest) {
+        authRequest.setDetails(this.authenticationDetailsSource.buildDetails(request));
+    }
+
+}

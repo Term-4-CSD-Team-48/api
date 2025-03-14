@@ -1,0 +1,88 @@
+package com.term_4_csd__50_001.api._legacy;
+
+import com.term_4_csd__50_001.api.collections.UserCollection;
+import com.term_4_csd__50_001.api.models.User;
+import java.util.HashMap;
+import java.util.Map;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.provisioning.UserDetailsManager;
+
+public class CustomUserDetailsManager implements UserDetailsManager {
+
+    private static final IllegalArgumentException noUserDetailsException =
+            new IllegalArgumentException("Please do not use UserDetails and use User instead");
+    private final UserCollection userCollection;
+    private final PasswordEncoder passwordEncoder;
+    private Map<String, User> cachedUsers = new HashMap<String, User>();
+
+    public CustomUserDetailsManager(UserCollection userCollection,
+            PasswordEncoder passwordEncoder) {
+        this.userCollection = userCollection;
+        this.passwordEncoder = passwordEncoder;
+    }
+
+    @Override
+    public void changePassword(String oldPassword, String newPassword) {
+        User currentUser = loadUserByUsername(
+                SecurityContextHolder.getContext().getAuthentication().getName());
+        currentUser.setPassword(newPassword, passwordEncoder);
+        updateUser(currentUser);
+    }
+
+    @Override
+    public void createUser(UserDetails userDetails) {
+        throw noUserDetailsException;
+    }
+
+    public void createUser(User user) {
+        cachedUsers.put(user.getUsername(), user);
+        userCollection.insertOne(user);;
+    }
+
+    @Override
+    public void deleteUser(String username) {
+        userCollection.deleteOne(new User.Builder().username(username).build());
+    }
+
+    @Override
+    public User loadUserByUsername(String username) throws UsernameNotFoundException {
+        if (cachedUsers.containsKey(username)) {
+            return cachedUsers.get(username);
+        }
+        User user = userCollection.findOne(new User.Builder().username(username).build());
+        if (user != null) {
+            cachedUsers.put(username, user);
+            return user;
+        }
+        throw new UsernameNotFoundException(username);
+    }
+
+    @Override
+    public void updateUser(UserDetails userDetails) {
+        throw noUserDetailsException;
+    }
+
+    public void updateUser(User user) {
+        String username = user.getUsername();
+        cachedUsers.put(username, user);
+        userCollection.updateOne(new User.Builder().username(username).build(), user);
+    }
+
+
+    @Override
+    public boolean userExists(String username) {
+        if (cachedUsers.containsKey(username)) {
+            return true;
+        }
+        User fetchedUser = userCollection.findOne(new User.Builder().username(username).build());
+        if (fetchedUser != null) {
+            cachedUsers.put(username, fetchedUser);
+            return true;
+        }
+        return false;
+    }
+
+}
