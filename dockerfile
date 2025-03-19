@@ -14,13 +14,7 @@ COPY src ./src
 # Install Gradle and build the application
 RUN chmod +x gradlew && ./gradlew clean build -x test
 
-# Verify the build output
-RUN ls -l build/libs
-
-# Copy the built JAR file to the working directory
-COPY build/libs/api-0.0.1-SNAPSHOT.jar app.jar
-
 EXPOSE 8080 
 EXPOSE 5000/udp
 
-ENTRYPOINT ["java", "-jar", "app.jar"]
+ENTRYPOINT ["java", "-jar", "build/libs/api-0.0.1-SNAPSHOT.jar"]
