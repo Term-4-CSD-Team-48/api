@@ -11,9 +11,6 @@ COPY gradle ./gradle
 # Copy the source code
 COPY src ./src
 
-# Copy the .env file
-COPY .env ./.env
-
 # Install Gradle and build the application
 RUN chmod +x gradlew && ./gradlew clean build -x test
 
