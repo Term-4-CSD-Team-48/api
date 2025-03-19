@@ -7,15 +7,24 @@ import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWeb
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.test.web.reactive.server.WebTestClient;
+import com.term_4_csd__50_001.api.collections.UserCollection;
+import lombok.extern.slf4j.Slf4j;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @AutoConfigureWebTestClient
 public class BaseTest {
+
     @Autowired
-    protected WebTestClient webTestClient;
+    protected UserCollection userCollection;
+
+    @Autowired
+    protected Dotenv dotenv;
 
     @Autowired
     private Database database;
+
+    @Autowired
+    protected WebTestClient webTestClient;
 
     final protected String authEP = "/auth";
     final protected String authenticatedEP = authEP + "/authenticated";
@@ -25,9 +34,19 @@ public class BaseTest {
     final protected String unregisterEP = authEP + "/unregister";
     final protected String verifyEmailEP = authEP + "/verify-email";
 
+    final protected String cameraEP = "/camera";
+    final protected String cameraStartListeningEP = cameraEP + "/start-listening";
+
+    final protected String cameraSecretFieldName = "camera_secret";
+    final protected String sharedSecretFieldName = "shared_secret";
+    final protected String sharedSecret = "0123456789ABCDEF";
+
+    final protected String aiEP = "/ai";
+    final protected String subscribeEP = "/ai/subscribe";
+
     final protected String emailVerificationTokenURLParam = "email-verification-token";
 
-    final protected String jSessionIdFieldName = "JSESSIONID";
+    final protected String jSessionIdCookieName = "JSESSIONID";
 
     @BeforeEach
     public void beforeEach() {
@@ -44,15 +63,15 @@ public class BaseTest {
         String jSessionId = "";
         if (setCookieHeader != null) {
             for (String cookie : setCookieHeader.split(";")) {
-                if (cookie.trim().startsWith(jSessionIdFieldName)) {
+                if (cookie.trim().startsWith(jSessionIdCookieName)) {
                     jSessionId = cookie.split("=")[1];
                     break;
                 }
             }
         }
         if (jSessionId == "") {
-            throw new IllegalArgumentException(
-                    String.format("Could not find %s in %s", jSessionIdFieldName, setCookieHeader));
+            throw new IllegalArgumentException(String.format("Could not find %s in %s",
+                    jSessionIdCookieName, setCookieHeader));
         }
         return jSessionId;
     }

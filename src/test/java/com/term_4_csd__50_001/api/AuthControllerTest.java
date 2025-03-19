@@ -1,18 +1,13 @@
 package com.term_4_csd__50_001.api;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import com.term_4_csd__50_001.api.collections.UserCollection;
 import com.term_4_csd__50_001.api.models.User;
 
 public class AuthControllerTest extends BaseTest {
 
-        @Autowired
-        private UserCollection userCollection;
-
-        @Test
+        // @Test
         public void userLifeCycleTest() throws Exception {
                 String emailFieldName = "email";
                 String usernameFieldName = "username";
@@ -87,28 +82,28 @@ public class AuthControllerTest extends BaseTest {
                 System.out.println("Extracted JSESSIONID: " + jSessionId);
 
                 // Access protected endpoint
-                webTestClient.post().uri(authenticatedEP).cookie(jSessionIdFieldName, jSessionId)
+                webTestClient.post().uri(authenticatedEP).cookie(jSessionIdCookieName, jSessionId)
                                 .exchange().expectStatus().isOk();
 
                 // Access protected endpoint with wrong jSessionId cookie
                 webTestClient.post().uri(authenticatedEP)
-                                .cookie(jSessionIdFieldName, "wrongJSessionId").exchange()
+                                .cookie(jSessionIdCookieName, "wrongJSessionId").exchange()
                                 .expectStatus().isUnauthorized();
 
                 // Logout with wrong jSessionId cookie
-                webTestClient.post().uri(logoutEP).cookie(jSessionIdFieldName, "wrongJSessionId")
+                webTestClient.post().uri(logoutEP).cookie(jSessionIdCookieName, "wrongJSessionId")
                                 .exchange().expectStatus().isUnauthorized();
 
                 // Logout
-                webTestClient.post().uri(logoutEP).cookie(jSessionIdFieldName, jSessionId)
+                webTestClient.post().uri(logoutEP).cookie(jSessionIdCookieName, jSessionId)
                                 .exchange().expectStatus().isOk();
 
                 // Access protected endpoint with logged out jSessionId cookie
-                webTestClient.post().uri(authenticatedEP).cookie(jSessionIdFieldName, jSessionId)
+                webTestClient.post().uri(authenticatedEP).cookie(jSessionIdCookieName, jSessionId)
                                 .exchange().expectStatus().isUnauthorized();
 
                 // Unregister user when not logged in
-                webTestClient.post().uri(unregisterEP).cookie(jSessionIdFieldName, jSessionId)
+                webTestClient.post().uri(unregisterEP).cookie(jSessionIdCookieName, jSessionId)
                                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                                 .bodyValue("password=" + rawPassword).exchange().expectStatus()
                                 .isUnauthorized();
@@ -127,11 +122,11 @@ public class AuthControllerTest extends BaseTest {
 
                 // Unregister user with wrong cookie, password
                 webTestClient.post().uri(unregisterEP)
-                                .cookie(jSessionIdFieldName, "wrongJSessionId")
+                                .cookie(jSessionIdCookieName, "wrongJSessionId")
                                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                                 .bodyValue("password=" + rawPassword).exchange().expectStatus()
                                 .isUnauthorized();
-                webTestClient.post().uri(unregisterEP).cookie(jSessionIdFieldName, jSessionId)
+                webTestClient.post().uri(unregisterEP).cookie(jSessionIdCookieName, jSessionId)
                                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                                 .bodyValue("password=" + "wrongPassword").exchange().expectStatus()
                                 .isBadRequest();

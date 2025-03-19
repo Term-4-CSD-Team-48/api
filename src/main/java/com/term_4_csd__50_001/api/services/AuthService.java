@@ -20,10 +20,21 @@ public class AuthService {
     private UserCollection userCollection;
 
     public void register(String email, String username, String password) {
-        User user = new User.Builder(passwordEncoder).email(email).username(username)
-                .password(password)
-                .authorities(Collections.singletonList(new GrantedAuthorityWrapper("ROLE_USER")))
-                .emailVerificationToken(UUID.randomUUID().toString()).enabled(true).build();
+        register(email, username, password, false);
+    }
+
+    public void register(String email, String username, String password, boolean verified) {
+        User.Builder builder =
+                new User.Builder(passwordEncoder).email(email).username(username).password(password)
+                        .authorities(
+                                Collections.singletonList(new GrantedAuthorityWrapper("ROLE_USER")))
+                        .enabled(true);
+        if (verified) {
+            builder = builder.emailVerified(true);
+        } else {
+            builder = builder.emailVerificationToken(UUID.randomUUID().toString());
+        }
+        User user = builder.build();
         userCollection.insertOne(user);
     }
 

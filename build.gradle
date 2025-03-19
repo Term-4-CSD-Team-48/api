@@ -18,14 +18,18 @@ repositories {
 }
 
 dependencies {
+	annotationProcessor 'org.projectlombok:lombok'
+	implementation 'io.github.cdimascio:dotenv-java:2.2.0'
+	implementation 'io.netty:netty-all:4.1.86.Final'
+	implementation 'org.bytedeco:javacv-platform:1.5.3' 
+	implementation 'org.mongodb:mongodb-driver-core:5.2.1'
+	implementation 'org.mongodb:mongodb-driver-sync:5.2.1'
 	implementation 'org.springframework.boot:spring-boot-starter'
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
 	implementation 'org.springframework.boot:spring-boot-starter-security'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
-	implementation 'org.springframework.boot:spring-boot-starter-webflux' 
-	implementation 'io.github.cdimascio:dotenv-java:2.2.0'
-	implementation 'org.mongodb:mongodb-driver-sync:5.2.1'
-	implementation 'org.mongodb:mongodb-driver-core:5.2.1'
+	implementation 'org.springframework.boot:spring-boot-starter-webflux'
+	implementation 'org.projectlombok:lombok'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }

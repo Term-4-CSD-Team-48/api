@@ -5,6 +5,7 @@ import static org.bson.codecs.configuration.CodecRegistries.fromRegistries;
 import org.bson.Document;
 import org.bson.codecs.configuration.CodecRegistry;
 import org.bson.codecs.pojo.PojoCodecProvider;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.mongodb.ConnectionString;
 import com.mongodb.MongoClientSettings;
@@ -14,16 +15,17 @@ import com.mongodb.ServerApiVersion;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoDatabase;
-import io.github.cdimascio.dotenv.Dotenv;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 public class MongoClientConnection {
 
     private MongoClient mongoClient;
 
-    public MongoClientConnection() {
-        Dotenv dotenv = Dotenv.load();
-        String connectionString = dotenv.get("MONGO_CONNECTION_STRING");
+    @Autowired
+    public MongoClientConnection(Dotenv dotenv) {
+        String connectionString = dotenv.get(Dotenv.MONGO_CONNECTION_STRING);
         ServerApi serverApi = ServerApi.builder().version(ServerApiVersion.V1).build();
         CodecRegistry pojoCodecRegistry =
                 fromProviders(PojoCodecProvider.builder().automatic(true).build());
@@ -39,7 +41,7 @@ public class MongoClientConnection {
             // Send a ping to confirm a successful connection
             MongoDatabase database = mongoClient.getDatabase("admin");
             database.runCommand(new Document("ping", 1));
-            System.out.println("Pinged your deployment. You successfully connected to MongoDB!");
+            log.info("Pinged your deployment. You successfully connected to MongoDB!");
         } catch (MongoException e) {
             e.printStackTrace();
         }

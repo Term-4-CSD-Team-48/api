@@ -32,7 +32,6 @@ public class GlobalExceptionHandler {
 
     public static ResponseStatusException translateMongoException(MongoWriteException e) {
         if (e.getCode() == 11000) {
-            System.out.println("Translating MongoWriteException to ConflictException");
             return new ConflictException(
                     "Another document with same field and value already exists in the collection",
                     e);

@@ -23,8 +23,8 @@ import jakarta.servlet.http.HttpServletResponse;
 @EnableWebSecurity
 public class SecurityConfiguration {
 
-        private static final String[] PUBLIC_URLS =
-                        {"/auth/login", "/auth/register", "/auth/verify-email"};
+        private static final String[] PUBLIC_URLS = {"/auth/login", "/auth/register",
+                        "/auth/verify-email", "/camera/start-listening"};
 
         @Bean
         public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -59,8 +59,7 @@ public class SecurityConfiguration {
                                                         response.getWriter().flush();
                                                 }).usernameParameter("email"))
                                 .exceptionHandling(exception -> exception
-                                                .authenticationEntryPoint((_, res, ex) -> {
-                                                        System.out.println(ex.getMessage());
+                                                .authenticationEntryPoint((_, res, _) -> {
                                                         res.setContentType("application/json");
                                                         res.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                                                         res.getWriter().write(

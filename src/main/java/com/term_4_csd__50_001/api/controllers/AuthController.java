@@ -14,7 +14,9 @@ import com.term_4_csd__50_001.api.services.AuthService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @RestController
 @RequestMapping("/auth")
 public class AuthController {
@@ -26,7 +28,7 @@ public class AuthController {
     public void authenticated() {}
 
     @PostMapping("/login")
-    public void login(HttpServletRequest request, HttpServletResponse response) {
+    public void login(HttpServletResponse response) {
         response.setStatus(501);
         try {
             response.getWriter().write("Not implemented");
@@ -37,7 +39,7 @@ public class AuthController {
 
     @PostMapping("/logout")
     public void logout(HttpServletRequest request) {
-        System.out.println("Received request at /logout");
+        log.info("Received request at /logout");
         HttpSession session = request.getSession(false);
         if (session != null) {
             session.invalidate();
@@ -47,7 +49,7 @@ public class AuthController {
 
     @PostMapping("/unregister")
     public void unregister(HttpServletRequest request) {
-        System.out.println("Received request at /unregister");
+        log.info("Received request at /unregister");
         HttpSession session = request.getSession(false);
         Object principal = session.getAttribute("SPRING_SECURITY_CONTEXT");
         Authentication authentication = ((SecurityContextImpl) principal).getAuthentication();
@@ -60,7 +62,7 @@ public class AuthController {
 
     @PostMapping("/register")
     public void register(HttpServletRequest request) {
-        System.out.println("Received request at /register");
+        log.info("Received request at /register");
         String email = request.getParameter("email");
         String username = request.getParameter("username");
         String rawPassword = request.getParameter("password");
