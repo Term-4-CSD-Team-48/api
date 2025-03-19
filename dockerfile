@@ -15,7 +15,7 @@ COPY src ./src
 RUN chmod +x gradlew && ./gradlew clean build -x test
 
 # Copy the built JAR file to the working directory
-COPY build/libs/*.jar app.jar
+COPY build/libs/api-0.0.1-SNAPSHOT.jar app.jar
 
 EXPOSE 8080 
 EXPOSE 5000/udp
