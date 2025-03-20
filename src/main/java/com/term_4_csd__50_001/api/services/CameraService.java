@@ -6,7 +6,16 @@ import java.util.Arrays;
 import java.util.Base64;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import org.bytedeco.javacpp.BytePointer;
+import org.bytedeco.javacv.FFmpegFrameGrabber;
+import org.bytedeco.javacv.Frame;
+import org.bytedeco.javacv.OpenCVFrameConverter;
+import org.bytedeco.opencv.global.opencv_highgui;
+import org.bytedeco.opencv.global.opencv_imgcodecs;
+import org.bytedeco.opencv.opencv_core.Mat;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import com.term_4_csd__50_001.api.Dotenv;
 import com.term_4_csd__50_001.api.exceptions.ConflictException;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.ByteBuf;
@@ -24,18 +33,24 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 public class CameraService {
 
+    private static volatile boolean listening = false;
+    private final String cameraURL;
     private final ExecutorService executorService = Executors.newSingleThreadExecutor();
-    private final int PORT = 5000;
-    private volatile boolean listening = false;
     private volatile String frameDataHash = "";
     private volatile byte[] frameData = new byte[0];
 
+    @Autowired
+    public CameraService(Dotenv dotenv) {
+        cameraURL = dotenv.get(Dotenv.CAMERA_URL);
+        startListening();
+    }
+
     public boolean isListening() {
-        return listening;
+        return CameraService.listening;
     }
 
     private void setListening(boolean listening) {
-        this.listening = listening;
+        CameraService.listening = listening;
     }
 
     public byte[] getFrameData() {
@@ -60,13 +75,56 @@ public class CameraService {
         this.frameDataHash = String.valueOf(frameData.hashCode());
     }
 
+    public void startListening() {
+        if (isListening())
+            throw new ConflictException("Already listening");
+
+        executorService.submit(() -> {
+            setListening(true);
+            int attempts = 0;
+            Frame frame;
+            Mat mat;
+            BytePointer bp;
+            byte[] frameData;
+            OpenCVFrameConverter.ToMat converter = new OpenCVFrameConverter.ToMat();
+            while (true) {
+                try (FFmpegFrameGrabber grabber = new FFmpegFrameGrabber(cameraURL);) {
+                    grabber.setOption("rtsp_transport_option", "tcp");
+                    grabber.start();
+                    while ((frame = grabber.grab()) != null) {
+                        mat = converter.convert(frame);
+                        bp = new BytePointer();
+                        boolean success = opencv_imgcodecs.imencode(".jpg", mat, bp);
+                        if (success) {
+                            frameData = new byte[(int) bp.limit()];
+                            bp.get(frameData);
+                            bp.close();
+                            setFrameData(frameData);
+                        }
+                        // Uncomment below 2 lines to see if frames are being received
+                        // opencv_highgui.imshow("Received Frame", mat);
+                        // opencv_highgui.waitKey(1);
+                    }
+                    grabber.close();
+                } catch (Exception e) {
+                    attempts = attempts + 1;
+                    log.warn("Could not connect to " + cameraURL + " for " + attempts + " times");
+                } finally {
+                    converter.close();
+                    setListening(false);
+                }
+            }
+        });
+    }
+
     /**
      * Requires that shared secret is 16 bytes long when encoded in java default charset
      * 
      * @param sharedSecret
      * @throws InterruptedException
      */
-    public void startListening(String sharedSecret) throws InterruptedException {
+    @Deprecated
+    public void startListening(String sharedSecret) {
         final byte[] sharedSecretInBytes = Base64.getDecoder().decode(sharedSecret);
 
         if (isListening())
@@ -75,6 +133,7 @@ public class CameraService {
         executorService.submit(() -> {
 
             EventLoopGroup group = new NioEventLoopGroup();
+            final int PORT = 5000;
             try {
                 Bootstrap bootstrap = new Bootstrap();
                 bootstrap.group(group).channel(NioDatagramChannel.class)
@@ -98,9 +157,19 @@ public class CameraService {
                                 byte[] receivedFrameData = new byte[receivedBytes.length - 16];
                                 System.arraycopy(receivedBytes, 16, receivedFrameData, 0,
                                         receivedFrameData.length);
-                                log.debug(String.format("Extracted frame data of length %d",
-                                        receivedFrameData.length));
+                                System.out
+                                        .println(String.format("Extracted frame data of length %d",
+                                                receivedFrameData.length));
                                 setFrameData(receivedFrameData);
+
+                                BytePointer bp = new BytePointer(receivedFrameData);
+                                Mat encodedMat = new Mat(bp);
+                                Mat frame = opencv_imgcodecs.imdecode(encodedMat,
+                                        opencv_imgcodecs.IMREAD_COLOR);
+                                if (!frame.empty()) {
+                                    opencv_highgui.imshow("Received Frame", frame);
+                                    opencv_highgui.waitKey(1); // Adjust delay if needed
+                                }
                             }
                         });
 
