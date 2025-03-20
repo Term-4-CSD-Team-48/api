@@ -1,6 +1,5 @@
 package com.term_4_csd__50_001.api.controllers;
 
-import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
