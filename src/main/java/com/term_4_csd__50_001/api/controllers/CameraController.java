@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.term_4_csd__50_001.api.Dotenv;
 import com.term_4_csd__50_001.api.exceptions.BadRequestException;
-import com.term_4_csd__50_001.api.exceptions.InternalServerErrorException;
 import com.term_4_csd__50_001.api.exceptions.UnauthorizedRequestException;
 import com.term_4_csd__50_001.api.services.CameraService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -28,7 +27,7 @@ public class CameraController {
         CAMERA_SECRET = dotenv.get(Dotenv.CAMERA_SECRET);
     }
 
-    @PostMapping("/start-listening")
+    // @PostMapping("/start-listening")
     public void startListening(HttpServletRequest request) {
         // Input checking
         log.info("Request received at /start-listening");
@@ -47,11 +46,7 @@ public class CameraController {
             throw new BadRequestException("shared_secret is not valid");
         }
         // Start listening on port 5000
-        try {
-            cameraService.startListening(sharedSecret);
-        } catch (InterruptedException e) {
-            throw new InternalServerErrorException("Something went wrong!");
-        }
+        cameraService.startListening(sharedSecret);
     }
 
 }
