@@ -32,19 +32,21 @@ public class CameraController {
     @PostMapping("/start-listening")
     public void startListening(HttpServletRequest request) {
         // Input checking
+        log.info("Request received at /start-listening");
         String cameraSecret = request.getParameter("camera_secret");
         if (!cameraSecret.equals(CAMERA_SECRET))
             throw new UnauthorizedRequestException("Provided camera secret is not valid");
         String sharedSecret = request.getParameter("shared_secret");
         if (sharedSecret == null)
             throw new BadRequestException("Please provide a shared secret");
-        int sharedSecretByteLength = Base64.getDecoder().decode(sharedSecret).length;
-        log.info("Request received at /start-listening and shared secret has byte length (UTF-8): "
-                + sharedSecretByteLength);
-        if (sharedSecretByteLength != 16)
-            throw new BadRequestException(
-                    "Please provide a shared secret that will be 16 bytes long when encoded in UTF-8");
-
+        try {
+            int sharedSecretByteLength = Base64.getDecoder().decode(sharedSecret).length;
+            if (sharedSecretByteLength != 16)
+                throw new BadRequestException(
+                        "Please provide a shared secret that will be 16 bytes long when encoded in UTF-8");
+        } catch (IllegalArgumentException e) {
+            throw new BadRequestException("shared_secret is not valid");
+        }
         // Start listening on port 5000
         try {
             cameraService.startListening(sharedSecret);
