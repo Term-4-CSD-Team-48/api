@@ -7,6 +7,7 @@ import java.util.Base64;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import org.springframework.stereotype.Service;
+import com.term_4_csd__50_001.api.exceptions.ConflictException;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
@@ -69,7 +70,7 @@ public class CameraService {
         final byte[] sharedSecretInBytes = Base64.getDecoder().decode(sharedSecret);
 
         if (isListening())
-            return;
+            throw new ConflictException("Already listening");
 
         executorService.submit(() -> {
 
