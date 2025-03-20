@@ -1,5 +1,6 @@
 package com.term_4_csd__50_001.api;
 
+import java.util.Base64;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,7 +40,9 @@ public class BaseTest {
 
     final protected String cameraSecretFieldName = "camera_secret";
     final protected String sharedSecretFieldName = "shared_secret";
-    final protected String sharedSecret = "0123456789ABCDEF";
+    final protected String sharedSecret = "QUJDREVGR0hJSktMTU4wMQ==";
+    final protected String urlEncodedSharedSecret = "QUJDREVGR0hJSktMTU4wMQ%3D%3D";
+    final protected byte[] sharedSecretBytes = Base64.getDecoder().decode(sharedSecret);
 
     final protected String aiEP = "/ai";
     final protected String subscribeEP = "/ai/subscribe";

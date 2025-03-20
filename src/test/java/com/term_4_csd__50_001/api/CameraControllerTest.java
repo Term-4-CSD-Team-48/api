@@ -9,7 +9,7 @@ import org.springframework.http.MediaType;
 
 public class CameraControllerTest extends BaseTest {
 
-        // @Test
+        @Test
         public void startListeningTest() throws Exception {
                 final String cameraSecret = dotenv.get(Dotenv.CAMERA_SECRET);
                 // Send an invalid cameraSecret
@@ -29,7 +29,8 @@ public class CameraControllerTest extends BaseTest {
                 webTestClient.post().uri(cameraStartListeningEP)
                                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                                 .bodyValue(cameraSecretFieldName + "=" + cameraSecret + "&"
-                                                + sharedSecretFieldName + "=" + sharedSecret)
+                                                + sharedSecretFieldName + "="
+                                                + urlEncodedSharedSecret)
                                 .exchange().expectStatus().isOk();
 
                 // CRITICAL: The following test will never throw an error. Please check
@@ -37,12 +38,15 @@ public class CameraControllerTest extends BaseTest {
                 // One way is to stop all other tests from running or someone
                 // please finally make this test testable.
                 String frameData = "frame_data";
-                String payload = sharedSecret + frameData;
+                byte[] frameDataBytes = frameData.getBytes();
+                byte[] payload = new byte[sharedSecretBytes.length + frameDataBytes.length];
+                System.arraycopy(sharedSecretBytes, 0, payload, 0, sharedSecretBytes.length);
+                System.arraycopy(frameDataBytes, 0, payload, sharedSecretBytes.length,
+                                frameDataBytes.length);
                 DatagramSocket socket = new DatagramSocket();
                 InetAddress address = InetAddress.getByName("localhost");
                 int port = 5000;
-                DatagramPacket packet = new DatagramPacket(payload.getBytes(), payload.length(),
-                                address, port);
+                DatagramPacket packet = new DatagramPacket(payload, payload.length, address, port);
                 Thread.sleep(100); // Packet can get sent before the server starts listening
                 socket.send(packet);
                 System.out.println("Sent UDP packet " + frameData + " to " + address + ":" + port
