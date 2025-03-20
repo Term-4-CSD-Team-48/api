@@ -15,6 +15,7 @@ public class Dotenv {
 
     public static final String AI_INFERENCE_IP_ADDRESS = "AI_INFERENCE_IP_ADDRESS";
     public static final String CAMERA_SECRET = "CAMERA_SECRET";
+    public static final String CAMERA_URL = "CAMERA_URL";
     public static final String MONGO_CONNECTION_STRING = "MONGO_CONNECTION_STRING";
 
     Dotenv() {
