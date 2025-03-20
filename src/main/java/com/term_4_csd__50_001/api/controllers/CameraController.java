@@ -1,6 +1,7 @@
 package com.term_4_csd__50_001.api.controllers;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -37,9 +38,9 @@ public class CameraController {
         String sharedSecret = request.getParameter("shared_secret");
         if (sharedSecret == null)
             throw new BadRequestException("Please provide a shared secret");
-        int sharedSecretUTF8ByteLength = sharedSecret.getBytes().length;
+        int sharedSecretByteLength = Base64.getDecoder().decode(sharedSecret).length;
         log.info("Request received at /start-listening and shared secret has byte length (UTF-8): "
-                + sharedSecretUTF8ByteLength);
+                + sharedSecretByteLength);
         if (sharedSecret.getBytes().length != 16)
             throw new BadRequestException(
                     "Please provide a shared secret that will be 16 bytes long when encoded in UTF-8");

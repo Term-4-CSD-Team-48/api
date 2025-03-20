@@ -3,6 +3,7 @@ package com.term_4_csd__50_001.api.services;
 import java.net.InetSocketAddress;
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import org.springframework.stereotype.Service;
@@ -65,7 +66,7 @@ public class CameraService {
      * @throws InterruptedException
      */
     public void startListening(String sharedSecret) throws InterruptedException {
-        final byte[] sharedSecretInBytes = sharedSecret.getBytes();
+        final byte[] sharedSecretInBytes = Base64.getDecoder().decode(sharedSecret);
 
         if (isListening())
             return;
