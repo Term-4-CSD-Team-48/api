@@ -30,7 +30,7 @@ public class CameraController {
     }
 
     @PostMapping("/start-listening")
-    public void register(HttpServletRequest request) {
+    public void startListening(HttpServletRequest request) {
         // Input checking
         String cameraSecret = request.getParameter("camera_secret");
         if (!cameraSecret.equals(CAMERA_SECRET))
@@ -41,7 +41,7 @@ public class CameraController {
         int sharedSecretByteLength = Base64.getDecoder().decode(sharedSecret).length;
         log.info("Request received at /start-listening and shared secret has byte length (UTF-8): "
                 + sharedSecretByteLength);
-        if (sharedSecret.getBytes().length != 16)
+        if (sharedSecretByteLength != 16)
             throw new BadRequestException(
                     "Please provide a shared secret that will be 16 bytes long when encoded in UTF-8");
 
