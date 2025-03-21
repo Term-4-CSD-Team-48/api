@@ -46,7 +46,7 @@ public class CameraController {
             throw new BadRequestException("shared_secret is not valid");
         }
         // Start listening on port 5000
-        cameraService.startListening(sharedSecret);
+        cameraService.beginGrabbingCameraFeed(sharedSecret);
     }
 
 }
