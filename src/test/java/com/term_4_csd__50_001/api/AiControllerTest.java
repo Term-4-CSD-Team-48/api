@@ -38,13 +38,16 @@ public class AiControllerTest extends BaseTest {
                 System.out.println("Extracted JSESSIONID: " + jSessionId);
 
                 // Register camera
-                final String cameraSecret = dotenv.get(Dotenv.CAMERA_SECRET);
-                webTestClient.post().uri(cameraStartListeningEP)
-                                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                                .bodyValue(cameraSecretFieldName + "=" + cameraSecret + "&"
-                                                + sharedSecretFieldName + "="
-                                                + urlEncodedSharedSecret)
-                                .exchange().expectStatus().isOk();
+                // Not needed to start listening as CameraController doesn't accept /start-listening
+                // requests and CameraServices will automatically ping the camera to listen
+                /**
+                 * final String cameraSecret = dotenv.get(Dotenv.CAMERA_SECRET);
+                 * webTestClient.post().uri(cameraStartListeningEP)
+                 * .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                 * .bodyValue(cameraSecretFieldName + "=" + cameraSecret + "&" +
+                 * sharedSecretFieldName + "=" + urlEncodedSharedSecret)
+                 * .exchange().expectStatus().isOk();
+                 */
 
                 // CRITICAL: The following test will never throw an error. Please check
                 // console to verify that UDP has been sent and received.
