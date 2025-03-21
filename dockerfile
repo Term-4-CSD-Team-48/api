@@ -1,27 +1,7 @@
-# First stage, build the custom JRE
-FROM eclipse-temurin:23-jdk-alpine AS jre-builder
+FROM openjdk:23-jdk
 
-# Install binutils, required by jlink
-RUN apk update &&  \
-    apk add binutils
-
-# Build small JRE image
-RUN $JAVA_HOME/bin/jlink \
---verbose \
---add-modules ALL-MODULE-PATH \
---strip-debug \
---no-man-pages \
---no-header-files \
---compress=2 \
---output /optimized-jdk-23
-
-# Second stage, Use the custom JRE and build the app image
-FROM alpine:latest
-ENV JAVA_HOME=/opt/jdk/jdk-23
-ENV PATH="${JAVA_HOME}/bin:${PATH}"
-
-# copy JRE from the base image
-COPY --from=jre-builder /optimized-jdk-23 $JAVA_HOME
+# Install necessary dependencies
+RUN apt-get update && apt-get install -y findutils && rm -rf /var/lib/apt/lists/*
 
 # Set the working directory in the container
 WORKDIR /app
