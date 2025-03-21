@@ -1,5 +1,5 @@
 # Use the Eclipse Temurin image for Java 23
-FROM eclipse-temurin:23-jdk-alpine
+FROM eclipse-temurin:23-jdk
 
 # Set the working directory in the container
 WORKDIR /app
