@@ -108,7 +108,7 @@ public class CameraService {
                     grabber.close();
                 } catch (Exception e) {
                     attempts = attempts + 1;
-                    log.warn("Could not connect to " + cameraURL + " for " + attempts + " times");
+                    log.error("Could not connect to " + cameraURL + " for " + attempts + " times");
                 } finally {
                     converter.close();
                     setListening(false);
