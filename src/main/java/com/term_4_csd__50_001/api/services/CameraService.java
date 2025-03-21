@@ -34,15 +34,23 @@ import lombok.extern.slf4j.Slf4j;
 public class CameraService {
 
     private static volatile boolean listening = false;
-    private final String cameraURL;
+    private volatile String cameraURL;
     private final ExecutorService executorService = Executors.newSingleThreadExecutor();
     private volatile String frameDataHash = "";
     private volatile byte[] frameData = new byte[0];
 
     @Autowired
     public CameraService(Dotenv dotenv) {
-        cameraURL = dotenv.get(Dotenv.CAMERA_URL);
+        setCameraURL(dotenv.get(Dotenv.CAMERA_URL));
         startListening();
+    }
+
+    public String getCameraURL() {
+        return cameraURL;
+    }
+
+    public void setCameraURL(String cameraURL) {
+        this.cameraURL = cameraURL;
     }
 
     public boolean isListening() {
