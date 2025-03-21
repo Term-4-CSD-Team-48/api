@@ -1,7 +1,4 @@
-FROM openjdk:23-jdk
-
-# Install necessary dependencies
-RUN apt-get update && apt-get install -y findutils && rm -rf /var/lib/apt/lists/*
+FROM eclipse-temurin:23
 
 # Set the working directory in the container
 WORKDIR /app
