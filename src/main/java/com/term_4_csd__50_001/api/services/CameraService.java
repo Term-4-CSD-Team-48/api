@@ -33,16 +33,16 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 public class CameraService {
 
-    private static volatile boolean listening = false;
-    private volatile String cameraURL;
+    private static volatile boolean grabbing = false;
     private final ExecutorService executorService = Executors.newSingleThreadExecutor();
+    private volatile String cameraURL;
     private volatile String frameDataHash = "";
     private volatile byte[] frameData = new byte[0];
 
     @Autowired
     public CameraService(Dotenv dotenv) {
         setCameraURL(dotenv.get(Dotenv.CAMERA_URL));
-        startListening();
+        beginGrabbingCameraFeed();
     }
 
     public String getCameraURL() {
@@ -53,12 +53,12 @@ public class CameraService {
         this.cameraURL = cameraURL;
     }
 
-    public boolean isListening() {
-        return CameraService.listening;
+    public boolean isGrabbing() {
+        return CameraService.grabbing;
     }
 
-    private void setListening(boolean listening) {
-        CameraService.listening = listening;
+    private void setGrabbing(boolean grabbing) {
+        CameraService.grabbing = grabbing;
     }
 
     public byte[] getFrameData() {
@@ -83,12 +83,12 @@ public class CameraService {
         this.frameDataHash = String.valueOf(frameData.hashCode());
     }
 
-    public void startListening() {
-        if (isListening())
+    public void beginGrabbingCameraFeed() {
+        if (isGrabbing())
             throw new ConflictException("Already listening");
 
         executorService.submit(() -> {
-            setListening(true);
+            setGrabbing(true);
             int attempts = 0;
             Frame frame;
             Mat mat;
@@ -96,7 +96,7 @@ public class CameraService {
             byte[] frameData;
             OpenCVFrameConverter.ToMat converter = new OpenCVFrameConverter.ToMat();
             while (true) {
-                try (FFmpegFrameGrabber grabber = new FFmpegFrameGrabber(cameraURL);) {
+                try (FFmpegFrameGrabber grabber = new FFmpegFrameGrabber(getCameraURL());) {
                     grabber.setOption("rtsp_transport_option", "tcp");
                     grabber.start();
                     while ((frame = grabber.grab()) != null) {
@@ -119,7 +119,7 @@ public class CameraService {
                     log.error("Could not connect to " + cameraURL + " for " + attempts + " times");
                 } finally {
                     converter.close();
-                    setListening(false);
+                    setGrabbing(false);
                 }
             }
         });
@@ -132,10 +132,10 @@ public class CameraService {
      * @throws InterruptedException
      */
     @Deprecated
-    public void startListening(String sharedSecret) {
+    public void beginGrabbingCameraFeed(String sharedSecret) {
         final byte[] sharedSecretInBytes = Base64.getDecoder().decode(sharedSecret);
 
-        if (isListening())
+        if (isGrabbing())
             throw new ConflictException("Already listening");
 
         executorService.submit(() -> {
@@ -183,17 +183,18 @@ public class CameraService {
 
                 log.info("Netty UDP Server listening on port " + PORT + " at "
                         + LocalDateTime.now());
-                setListening(true);
+                setGrabbing(true);
                 Channel channel = bootstrap.bind(new InetSocketAddress(PORT)).sync().channel();
                 channel.closeFuture().await();
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
                 log.info("UDP Listener interrupted");
             } finally {
-                setListening(false);
+                setGrabbing(false);
                 log.info("Netty UDP Server shutting down");
                 group.shutdownGracefully();
             }
         });
     }
+
 }

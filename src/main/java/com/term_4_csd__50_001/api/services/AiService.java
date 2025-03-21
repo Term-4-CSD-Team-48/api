@@ -141,7 +141,7 @@ public class AiService {
     }
 
     public void subscribe(String ip, int port) {
-        if (!cameraService.isListening())
+        if (!cameraService.isGrabbing())
             throw new InternalServerErrorException("Not receiving anything from camera");
         String combined = combineIpAndPort(ip, port);
         insertSubscription(combined);
