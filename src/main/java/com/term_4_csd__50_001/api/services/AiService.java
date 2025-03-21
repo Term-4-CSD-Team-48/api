@@ -1,5 +1,7 @@
 package com.term_4_csd__50_001.api.services;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.HttpURLConnection;
@@ -52,7 +54,7 @@ public class AiService {
 
     private void pingAiServerRegularly() {
         if (isPingingAiServer())
-            throw new ConflictException("Already pinging ai server");
+            throw new ConflictException("Already pinging AI server");
         setPingingAiServer(true);
         executorService.submit(() -> {
             while (true) {
@@ -64,12 +66,20 @@ public class AiService {
                     connection.setRequestMethod("GET");
                     int code = connection.getResponseCode();
                     if (code == 200) {
-                        String body = (String) connection.getContent();
-                        log.debug("When pinged AI server, it responded with body " + body);
-                        if (body == "healthy") {
-                            setAiServerHealthy(true);
-                        } else {
-                            setAiServerHealthy(false);
+                        try (BufferedReader reader = new BufferedReader(
+                                new InputStreamReader(connection.getInputStream()))) {
+                            StringBuilder response = new StringBuilder();
+                            String line;
+                            while ((line = reader.readLine()) != null) {
+                                response.append(line);
+                            }
+                            String body = response.toString();
+                            log.debug("When pinged AI server, it responded with body " + body);
+                            if ("healthy".equals(body)) {
+                                setAiServerHealthy(true);
+                            } else {
+                                setAiServerHealthy(false);
+                            }
                         }
                     } else {
                         log.error("AI server responded with code " + code + " when pinged");
