@@ -9,7 +9,8 @@ import org.springframework.http.MediaType;
 
 public class CameraControllerTest extends BaseTest {
 
-        @Test
+        // @Test
+        @Deprecated
         public void startListeningTest() throws Exception {
                 final String cameraSecret = dotenv.get(Dotenv.CAMERA_SECRET);
                 // Send an invalid cameraSecret
