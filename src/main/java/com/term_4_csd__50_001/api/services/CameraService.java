@@ -35,6 +35,7 @@ public class CameraService {
 
     private static volatile boolean grabbing = false;
     private final ExecutorService executorService = Executors.newSingleThreadExecutor();
+    private final String rtmpURL = "rtmp://127.0.0.1/live/stream";
     private volatile String cameraURL;
     private volatile String frameDataHash = "";
     private volatile byte[] frameData = new byte[0];
@@ -96,7 +97,7 @@ public class CameraService {
             byte[] frameData;
             OpenCVFrameConverter.ToMat converter = new OpenCVFrameConverter.ToMat();
             while (true) {
-                try (FFmpegFrameGrabber grabber = new FFmpegFrameGrabber(getCameraURL());) {
+                try (FFmpegFrameGrabber grabber = new FFmpegFrameGrabber(rtmpURL);) {
                     grabber.setOption("rtsp_transport_option", "tcp");
                     grabber.start();
                     while ((frame = grabber.grab()) != null) {
@@ -116,7 +117,7 @@ public class CameraService {
                     grabber.close();
                 } catch (Exception e) {
                     attempts = attempts + 1;
-                    log.error("Could not connect to " + cameraURL + " for " + attempts + " times");
+                    log.error("Could not connect to " + rtmpURL + " for " + attempts + " times");
                 } finally {
                     converter.close();
                     setGrabbing(false);
