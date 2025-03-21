@@ -2,7 +2,10 @@ package com.term_4_csd__50_001.api.services;
 
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
+import java.net.HttpURLConnection;
 import java.net.InetAddress;
+import java.net.URI;
+import java.net.URL;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
@@ -37,11 +40,69 @@ public class AiService {
      * Use insertSubscription and removeSubscription to manipulate
      */
     private volatile Map<String, Boolean> subscriptions = new HashMap<>();
+    private volatile boolean pingingAiServer = false;
+    private volatile boolean aiServerHealthy = false;
 
     @Autowired
     public AiService(Dotenv dotenv, CameraService cameraService) {
         AI_INFERENCE_IP_ADDRESS = dotenv.get(Dotenv.AI_INFERENCE_IP_ADDRESS);
         this.cameraService = cameraService;
+        pingAiServerRegularly();
+    }
+
+    private void pingAiServerRegularly() {
+        if (isPingingAiServer())
+            throw new ConflictException("Already pinging ai server");
+        setPingingAiServer(true);
+        executorService.submit(() -> {
+            while (true) {
+                try {
+                    URI uri = new URI("http", null, AI_INFERENCE_IP_ADDRESS, 8080, "/ping", null,
+                            null);
+                    URL url = uri.toURL();
+                    HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                    connection.setRequestMethod("GET");
+                    int code = connection.getResponseCode();
+                    if (code == 200) {
+                        String body = (String) connection.getContent();
+                        log.debug("When pinged AI server, it responded with body " + body);
+                        if (body == "healthy") {
+                            setAiServerHealthy(true);
+                        } else {
+                            setAiServerHealthy(false);
+                        }
+                    } else {
+                        log.error("AI server responded with code " + code + " when pinged");
+                        setAiServerHealthy(false);
+                    }
+                    Thread.sleep(1000 * 60); // Wait before checking again
+                } catch (InterruptedException e) {
+                    setPingingAiServer(false);
+                    setAiServerHealthy(false);
+                    log.info("Subscription thread interrupted");
+                    Thread.currentThread().interrupt();
+                } catch (Exception e) {
+                    setAiServerHealthy(false);
+                    log.error("Error in subscription thread: " + e.getMessage());
+                }
+            }
+        });
+    }
+
+    private void setAiServerHealthy(boolean aiServerHealthy) {
+        this.aiServerHealthy = aiServerHealthy;
+    }
+
+    public boolean isAiServerHealthy() {
+        return aiServerHealthy;
+    }
+
+    private void setPingingAiServer(boolean pingingAiServer) {
+        this.pingingAiServer = pingingAiServer;
+    }
+
+    public boolean isPingingAiServer() {
+        return pingingAiServer;
     }
 
     /**
@@ -111,14 +172,13 @@ public class AiService {
 
                     Thread.sleep(intervalMillis); // Wait before checking again
                 } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
                     log.info("Subscription thread interrupted");
-                    break;
+                    removeSubscription(combined);
+                    Thread.currentThread().interrupt();
                 } catch (Exception e) {
                     log.error("Error in subscription thread: " + e.getMessage());
                 }
             }
-            removeSubscription(combined);
         });
     }
 
