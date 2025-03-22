@@ -95,8 +95,8 @@ public class CameraService {
             Mat mat;
             BytePointer bp;
             byte[] frameData;
-            OpenCVFrameConverter.ToMat converter = new OpenCVFrameConverter.ToMat();
             while (true) {
+                OpenCVFrameConverter.ToMat converter = new OpenCVFrameConverter.ToMat();
                 try (FFmpegFrameGrabber grabber = new FFmpegFrameGrabber(rtmpURL);) {
                     grabber.setOption("rtsp_transport_option", "tcp");
                     grabber.start();
@@ -105,10 +105,15 @@ public class CameraService {
                         bp = new BytePointer();
                         boolean success = opencv_imgcodecs.imencode(".jpg", mat, bp);
                         if (success) {
+                            log.debug("Able to encode into jpg a frame of " + frame.imageWidth + "x"
+                                    + frame.imageHeight);
                             frameData = new byte[(int) bp.limit()];
                             bp.get(frameData);
                             bp.close();
                             setFrameData(frameData);
+                        } else {
+                            log.debug("Failed to encode into jpg a frame of " + frame.imageWidth
+                                    + "x" + frame.imageHeight);
                         }
                         // Uncomment below 2 lines to see if frames are being received
                         // opencv_highgui.imshow("Received Frame", mat);
@@ -118,10 +123,8 @@ public class CameraService {
                 } catch (Exception e) {
                     attempts = attempts + 1;
                     log.error("Could not connect to " + rtmpURL + " for " + attempts + " times");
-                } finally {
-                    converter.close();
-                    setGrabbing(false);
                 }
+                converter.close();
             }
         });
     }
