@@ -89,6 +89,7 @@ public class CameraService {
             throw new ConflictException("Already listening");
 
         executorService.submit(() -> {
+            log.info("Starting thread to grab frames from " + rtmpURL);
             setGrabbing(true);
             int attempts = 0;
             Frame frame;
