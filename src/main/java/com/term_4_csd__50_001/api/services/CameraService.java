@@ -100,6 +100,7 @@ public class CameraService {
                 try (FFmpegFrameGrabber grabber = new FFmpegFrameGrabber(rtmpURL);) {
                     grabber.setOption("rtsp_transport_option", "tcp");
                     grabber.start();
+                    log.info("Grabber started pulling from " + rtmpURL);
                     while ((frame = grabber.grab()) != null) {
                         mat = converter.convert(frame);
                         bp = new BytePointer();
