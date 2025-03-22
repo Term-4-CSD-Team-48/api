@@ -100,7 +100,7 @@ public class CameraService {
                 OpenCVFrameConverter.ToMat converter = new OpenCVFrameConverter.ToMat();
                 try {
                     FFmpegFrameGrabber grabber = new FFmpegFrameGrabber(rtmpURL);
-                    grabber.setOption("rtsp_transport_option", "tcp");
+                    grabber.setOption("rtmp_live", "live");
                     grabber.start();
                     log.info("Grabber started pulling from " + rtmpURL);
                     while ((frame = grabber.grab()) != null) {
