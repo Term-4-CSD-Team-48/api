@@ -98,7 +98,8 @@ public class CameraService {
             byte[] frameData;
             while (true) {
                 OpenCVFrameConverter.ToMat converter = new OpenCVFrameConverter.ToMat();
-                try (FFmpegFrameGrabber grabber = new FFmpegFrameGrabber(rtmpURL);) {
+                try {
+                    FFmpegFrameGrabber grabber = new FFmpegFrameGrabber(rtmpURL);
                     grabber.setOption("rtsp_transport_option", "tcp");
                     grabber.start();
                     log.info("Grabber started pulling from " + rtmpURL);
@@ -125,8 +126,9 @@ public class CameraService {
                 } catch (Exception e) {
                     attempts = attempts + 1;
                     log.error("Could not connect to " + rtmpURL + " for " + attempts + " times");
+                } finally {
+                    converter.close();
                 }
-                converter.close();
             }
         });
     }
