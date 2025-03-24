@@ -66,6 +66,8 @@ public class AuthController {
         String email = request.getParameter("email");
         String username = request.getParameter("username");
         String rawPassword = request.getParameter("password");
+        log.debug(String.format("Obtained fields for\nEmail: %s\nUsername: %s\nPassword: %s", email,
+                username, rawPassword));
         authService.register(email, username, rawPassword);
     }
 
