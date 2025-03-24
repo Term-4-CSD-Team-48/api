@@ -23,8 +23,8 @@ import jakarta.servlet.http.HttpServletResponse;
 @EnableWebSecurity
 public class SecurityConfiguration {
 
-        private static final String[] PUBLIC_URLS = {"/auth/login", "/auth/register",
-                        "/auth/verify-email", "/camera/start-listening"};
+        private static final String[] PUBLIC_URLS =
+                        {"/auth/login", "/auth/register", "/auth/verify-email"};
 
         @Bean
         public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
