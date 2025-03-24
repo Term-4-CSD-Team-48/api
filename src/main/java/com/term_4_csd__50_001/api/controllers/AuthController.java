@@ -67,7 +67,8 @@ public class AuthController {
         String username = request.getParameter("username");
         String rawPassword = request.getParameter("password");
         log.debug(String.format("Obtained fields for\nEmail: %s\nUsername: %s\nPassword: %s", email,
-                username, rawPassword));
+                username, (rawPassword != null && !rawPassword.isEmpty()) ? "[RAWPASSWORD RECEIVED]"
+                        : "[RAWPASSWORD EMPTY OR NULL]"));
         authService.register(email, username, rawPassword);
     }
 
