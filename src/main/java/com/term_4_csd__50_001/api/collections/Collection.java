@@ -10,7 +10,6 @@ import com.mongodb.MongoWriteException;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.InsertOneResult;
-import com.term_4_csd__50_001.api.exceptions.ConflictException;
 
 public abstract class Collection<M> {
 
