@@ -16,12 +16,4 @@ public class AiController {
     @Autowired
     private AiService aiService;
 
-    @PostMapping("/subscribe")
-    public void subscribe(HttpServletRequest request) {
-        String ipAddress = request.getRemoteAddr();
-        int port = request.getRemotePort();
-        log.info(String.format("Received request from %s:%d", ipAddress, port));
-        aiService.subscribe(ipAddress, port);
-    }
-
 }
