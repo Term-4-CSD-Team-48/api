@@ -47,7 +47,6 @@ public abstract class Collection<M> {
      * @param model
      * @return
      * @throws MongoWriteException
-     * @throws ConflictException
      */
     public String insertOne(M model) {
         MongoCollection<M> collection = getCollection();
