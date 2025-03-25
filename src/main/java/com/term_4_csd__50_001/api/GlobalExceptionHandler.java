@@ -10,6 +10,9 @@ import com.mongodb.MongoWriteException;
 import com.term_4_csd__50_001.api.exceptions.ConflictException;
 import com.term_4_csd__50_001.api.exceptions.InternalServerErrorException;
 
+/**
+ * It's not global. Login attempts made to AuthenticationFilter has its own failure handler
+ */
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
