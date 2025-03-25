@@ -10,6 +10,8 @@ import com.term_4_csd__50_001.api.collections.UpdateBuilder;
 import com.term_4_csd__50_001.api.collections.UserCollection;
 import com.term_4_csd__50_001.api.exceptions.BadRequestException;
 import com.term_4_csd__50_001.api.models.User;
+import com.term_4_csd__50_001.api.services.MailService.MailBuilder;
+import com.term_4_csd__50_001.api.services.IPService;
 
 @Service
 public class AuthService {
@@ -18,6 +20,10 @@ public class AuthService {
     private PasswordEncoder passwordEncoder;
     @Autowired
     private UserCollection userCollection;
+    @Autowired
+    private MailService mailService;
+    @Autowired
+    private IPService ipService;
 
     public void register(String email, String username, String password) {
         register(email, username, password, false);
@@ -29,13 +35,26 @@ public class AuthService {
                         .authorities(
                                 Collections.singletonList(new GrantedAuthorityWrapper("ROLE_USER")))
                         .enabled(true);
+        String emailVerificationToken = UUID.randomUUID().toString();
         if (verified) {
             builder = builder.emailVerified(true);
         } else {
-            builder = builder.emailVerificationToken(UUID.randomUUID().toString());
+            builder = builder.emailVerificationToken(emailVerificationToken);
         }
         User user = builder.build();
+        sendVerificationEmail(emailVerificationToken, email);
         userCollection.insertOne(user);
+    }
+
+    private void sendVerificationEmail(String token, String email) {
+        if (System.getProperty("java.class.path").contains("test-classes"))
+            return;
+        String publicIP = ipService.getSelfPublicIP();
+        MailBuilder mailBuilder = mailService.mailBuilder()
+                .text(String.format("http://%s:8080/auth/verify-email?email-verification-token=%s",
+                        publicIP, token))
+                .recipients(email).subject("Email verification for ParcelEye");
+        mailService.sendMail(mailBuilder);
     }
 
     public void unregister(String email, String rawPassword) {
