@@ -17,6 +17,12 @@ public class Dotenv {
     public static final String CAMERA_SECRET = "CAMERA_SECRET";
     public static final String CAMERA_URL = "CAMERA_URL";
     public static final String MONGO_CONNECTION_STRING = "MONGO_CONNECTION_STRING";
+    public static final String MAIL_HOST = "MAIL_HOST";
+    public static final String MAIL_PORT = "MAIL_PORT";
+    public static final String MAIL_USERNAME = "MAIL_USERNAME";
+    public static final String MAIL_PASSWORD = "MAIL_PASSWORD";
+    public static final String MAIL_SMTP_AUTH = "MAIL_SMTP_AUTH";
+    public static final String MAIL_SMTP_STARTTLS = "MAIL_SMTP_STARTTLS";
 
     Dotenv() {
         try {
