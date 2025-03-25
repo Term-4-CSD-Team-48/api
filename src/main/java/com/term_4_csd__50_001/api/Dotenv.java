@@ -22,7 +22,7 @@ public class Dotenv {
         try {
             dotenv = io.github.cdimascio.dotenv.Dotenv.load();
         } catch (Exception e) {
-            log.warn(
+            log.error(
                     "Something went wrong while loading .env file. This can be safely ignored during runtime if you have set the required .env variables, otherwise the get method will throw an error if the required variables cannot be found.");
         }
     }
