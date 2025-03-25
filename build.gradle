@@ -19,8 +19,10 @@ repositories {
 
 dependencies {
 	annotationProcessor 'org.projectlombok:lombok'
+	implementation 'com.sun.mail:jakarta.mail:2.0.1'
 	implementation 'io.github.cdimascio:dotenv-java:2.2.0'
 	implementation 'io.netty:netty-all:4.1.86.Final'
+	implementation 'jakarta.mail:jakarta.mail-api:2.1.2'
 	implementation 'org.bytedeco:opencv-platform:4.10.0-1.5.11' 
 	implementation 'org.bytedeco:javacv-platform:1.5.11'
 	implementation 'org.mongodb:mongodb-driver-core:5.2.1'
