@@ -1,7 +1,9 @@
 package com.term_4_csd__50_001.api.models;
 
 import java.util.List;
+import java.util.regex.Pattern;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import com.term_4_csd__50_001.api.exceptions.BadRequestException;
 import com.term_4_csd__50_001.api.GrantedAuthorityWrapper;
 
 /**
@@ -76,6 +78,8 @@ public class User {
         private Boolean enabled;
         private String password;
         private String username;
+        public static final Pattern VALID_EMAIL_ADDRESS_REGEX = Pattern
+                .compile("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$", Pattern.CASE_INSENSITIVE);
 
         /**
          * Not passing PasswordEncoder in the constructor will cause nullptr exception if password
@@ -94,6 +98,8 @@ public class User {
         }
 
         public Builder email(String email) {
+            if (!VALID_EMAIL_ADDRESS_REGEX.matcher(email).matches())
+                throw new BadRequestException("Email is not valid!");
             this.email = email;
             return this;
         }
