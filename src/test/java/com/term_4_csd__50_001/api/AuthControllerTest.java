@@ -7,7 +7,7 @@ import com.term_4_csd__50_001.api.models.User;
 
 public class AuthControllerTest extends BaseTest {
 
-        // @Test
+        @Test
         public void userLifeCycleTest() throws Exception {
                 String emailFieldName = "email";
                 String usernameFieldName = "username";
@@ -32,6 +32,14 @@ public class AuthControllerTest extends BaseTest {
                                                 + "=" + username + "&" + passwordFieldName + "="
                                                 + rawPassword)
                                 .exchange().expectStatus().isEqualTo(409);
+
+                // Should throw an error as we haven't verified email but login
+                System.out.println(webTestClient.post().uri(loginEP)
+                                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                                .bodyValue(emailFieldName + "=" + email + "&" + passwordFieldName
+                                                + "=" + rawPassword)
+                                .exchange().expectStatus().isUnauthorized().expectBody(String.class)
+                                .isEqualTo("Not").returnResult().getResponseBody());
 
                 // Checking database directly to see if user is registered
                 User findOne = User.builder().email(email).build();
