@@ -40,18 +40,14 @@ public class SecurityConfiguration {
                                                 .successHandler((_, _, _) -> {
                                                 }).failureHandler((_, response, exception) -> {
                                                         String errorMessage =
-                                                                        "Authentication failed";
+                                                                        exception.getMessage();
                                                         if (exception instanceof BadCredentialsException) {
-                                                                errorMessage = "Invalid email or password";
                                                                 response.setStatus(
                                                                                 HttpServletResponse.SC_UNAUTHORIZED);
                                                         } else if (exception instanceof DisabledException) {
-                                                                errorMessage = exception
-                                                                                .getMessage();
                                                                 response.setStatus(
                                                                                 HttpServletResponse.SC_FORBIDDEN);
                                                         } else if (exception instanceof LockedException) {
-                                                                errorMessage = "User account is locked";
                                                                 response.setStatus(
                                                                                 HttpServletResponse.SC_FORBIDDEN);
                                                         }
