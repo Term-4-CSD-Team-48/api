@@ -38,7 +38,7 @@ public class CustomAuthenticationManager implements AuthenticationManager {
             throw new DisabledException("User disabled");
 
         if (!user.isEmailVerified())
-            throw new DisabledException("Email not verified");
+            throw new BadCredentialsException("Email not verified");
 
         if (!passwordEncoder.matches(rawPassword, user.getPassword()))
             throw new BadCredentialsException("Invalid password");
