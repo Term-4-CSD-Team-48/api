@@ -12,7 +12,7 @@ public class AuthControllerTest extends BaseTest {
                 String emailFieldName = "email";
                 String usernameFieldName = "username";
                 String passwordFieldName = "password";
-                String email = "xyf.oco@gmail.com";
+                String email = "yufeng_xue@mymail.sutd.edu.sg";
                 String username = "username";
                 String rawPassword = "password";
 
@@ -32,6 +32,14 @@ public class AuthControllerTest extends BaseTest {
                                                 + "=" + username + "&" + passwordFieldName + "="
                                                 + rawPassword)
                                 .exchange().expectStatus().isEqualTo(409);
+
+                // Should throw 400 as email is invalid
+                webTestClient.post().uri(registerEP)
+                                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                                .bodyValue(emailFieldName + "=" + "invalid" + "&"
+                                                + usernameFieldName + "=" + username + "&"
+                                                + passwordFieldName + "=" + rawPassword)
+                                .exchange().expectStatus().isEqualTo(400);
 
                 // Should throw an error as we haven't verified email but login
                 System.out.println(webTestClient.post().uri(loginEP)
