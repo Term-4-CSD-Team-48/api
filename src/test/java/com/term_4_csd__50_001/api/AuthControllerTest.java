@@ -39,7 +39,7 @@ public class AuthControllerTest extends BaseTest {
                                 .bodyValue(emailFieldName + "=" + email + "&" + passwordFieldName
                                                 + "=" + rawPassword)
                                 .exchange().expectStatus().isUnauthorized().expectBody(String.class)
-                                .isEqualTo("Not").returnResult().getResponseBody());
+                                .isEqualTo("Email not verified").returnResult().getResponseBody());
 
                 // Checking database directly to see if user is registered
                 User findOne = User.builder().email(email).build();
