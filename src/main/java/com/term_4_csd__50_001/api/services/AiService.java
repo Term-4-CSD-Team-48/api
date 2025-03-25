@@ -71,6 +71,7 @@ public class AiService {
                 } catch (Exception e) {
                     setAiServerHealthy(false);
                     log.error("Error in subscription thread: " + e.getMessage());
+                    Thread.sleep(1000 * 60); // Wait before checking again
                 }
             }
         });
