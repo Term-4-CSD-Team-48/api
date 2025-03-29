@@ -9,7 +9,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import com.term_4_csd__50_001.api.collections.UserCollection;
-import lombok.extern.slf4j.Slf4j;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @AutoConfigureWebTestClient
@@ -45,7 +44,8 @@ public class BaseTest {
     final protected byte[] sharedSecretBytes = Base64.getDecoder().decode(sharedSecret);
 
     final protected String aiEP = "/ai";
-    final protected String subscribeEP = "/ai/subscribe";
+    final protected String assumeControlEP = aiEP + "/assume-control";
+    final protected String invocationsEP = aiEP + "/invocations";
 
     final protected String emailVerificationTokenURLParam = "email-verification-token";
 
