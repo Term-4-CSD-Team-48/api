@@ -3,8 +3,8 @@ package com.term_4_csd__50_001.api.models;
 import java.util.List;
 import java.util.regex.Pattern;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import com.term_4_csd__50_001.api.exceptions.BadRequestException;
 import com.term_4_csd__50_001.api.GrantedAuthorityWrapper;
+import com.term_4_csd__50_001.api.exceptions.BadRequestException;
 
 /**
  * Password is always stored as a hash All Boolean fields are treated as true by their getters if
