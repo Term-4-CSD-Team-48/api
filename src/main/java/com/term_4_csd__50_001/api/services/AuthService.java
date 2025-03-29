@@ -8,10 +8,9 @@ import org.springframework.stereotype.Service;
 import com.term_4_csd__50_001.api.GrantedAuthorityWrapper;
 import com.term_4_csd__50_001.api.collections.UpdateBuilder;
 import com.term_4_csd__50_001.api.collections.UserCollection;
-import com.term_4_csd__50_001.api.exceptions.BadRequestException;
+import com.term_4_csd__50_001.api.exceptions.UnauthorizedRequestException;
 import com.term_4_csd__50_001.api.models.User;
 import com.term_4_csd__50_001.api.services.MailService.MailBuilder;
-import com.term_4_csd__50_001.api.services.IPService;
 
 @Service
 public class AuthService {
@@ -47,8 +46,6 @@ public class AuthService {
     }
 
     private void sendVerificationEmail(String token, String email) {
-        if (System.getProperty("java.class.path").contains("test-classes"))
-            return;
         String publicIP = ipService.getSelfPublicIP();
         MailBuilder mailBuilder = mailService.mailBuilder()
                 .text(String.format("http://%s:8080/auth/verify-email?email-verification-token=%s",
@@ -63,7 +60,7 @@ public class AuthService {
         if (passwordEncoder.matches(rawPassword, user.getPassword())) {
             userCollection.deleteOne(user);
         } else {
-            throw new BadRequestException(
+            throw new UnauthorizedRequestException(
                     "Password provided does not match with user that must be deleted");
         }
     }
