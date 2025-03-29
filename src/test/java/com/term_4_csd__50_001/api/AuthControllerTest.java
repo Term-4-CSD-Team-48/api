@@ -39,7 +39,7 @@ public class AuthControllerTest extends BaseTest {
                                 .bodyValue(emailFieldName + "=" + "invalid" + "&"
                                                 + usernameFieldName + "=" + username + "&"
                                                 + passwordFieldName + "=" + rawPassword)
-                                .exchange().expectStatus().isEqualTo(400);
+                                .exchange().expectStatus().isBadRequest();
 
                 // Should throw an error as we haven't verified email but login
                 System.out.println(webTestClient.post().uri(loginEP)
@@ -145,7 +145,7 @@ public class AuthControllerTest extends BaseTest {
                 webTestClient.post().uri(unregisterEP).cookie(jSessionIdCookieName, jSessionId)
                                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                                 .bodyValue("password=" + "wrongPassword").exchange().expectStatus()
-                                .isBadRequest();
+                                .isUnauthorized();
         }
 
 }
