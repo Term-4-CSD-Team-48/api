@@ -19,6 +19,7 @@ repositories {
 
 dependencies {
 	annotationProcessor 'org.projectlombok:lombok'
+	implementation 'com.google.firebase:firebase-admin:9.2.0'
 	implementation 'com.sun.mail:jakarta.mail:2.0.1'
 	implementation 'io.github.cdimascio:dotenv-java:2.2.0'
 	implementation 'io.netty:netty-all:4.1.86.Final'
