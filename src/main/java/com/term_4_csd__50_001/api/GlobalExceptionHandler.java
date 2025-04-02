@@ -21,7 +21,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ResponseStatusException.class)
     public ResponseEntity<Map<String, String>> handleResponseStatusException(
             ResponseStatusException ex) {
-        log.error(ex.getMessage(), ex);
+        log.error(ex.getMessage());
         Map<String, String> error = new HashMap<>();
         error.put("error", ex.getReason());
         return new ResponseEntity<>(error, ex.getStatusCode());
@@ -30,7 +30,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(MongoWriteException.class)
     public ResponseEntity<Map<String, String>> handleMongoWriteException(
             MongoWriteException exception) {
-        log.error(exception.getMessage(), exception);
+        log.error(exception.getMessage());
         Map<String, String> error = new HashMap<>();
         ResponseStatusException ex = translateMongoException(exception);
         error.put("error", ex.getReason());
