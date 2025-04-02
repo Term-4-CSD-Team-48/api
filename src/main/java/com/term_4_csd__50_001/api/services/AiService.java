@@ -62,6 +62,7 @@ public class AiService {
                     throw new InternalServerErrorException("Could not communicate with ai");
             }
         } catch (Exception e) {
+            log.error(e.getMessage(), e);
             throw new InternalServerErrorException("Something went wrong", e);
         }
     }
@@ -106,6 +107,7 @@ public class AiService {
                             "An unknown error occured in sending request to AI server");
             }
         } catch (Exception e) {
+            log.error(e.getMessage(), e);
             throw new InternalServerErrorException("Could not communicate with AI server", e);
         }
     }
