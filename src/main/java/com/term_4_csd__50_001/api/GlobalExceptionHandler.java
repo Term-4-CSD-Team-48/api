@@ -9,16 +9,19 @@ import org.springframework.web.server.ResponseStatusException;
 import com.mongodb.MongoWriteException;
 import com.term_4_csd__50_001.api.exceptions.ConflictException;
 import com.term_4_csd__50_001.api.exceptions.InternalServerErrorException;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * It's not global. Login attempts made to AuthenticationFilter has its own failure handler
  */
 @RestControllerAdvice
+@Slf4j
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(ResponseStatusException.class)
     public ResponseEntity<Map<String, String>> handleResponseStatusException(
             ResponseStatusException ex) {
+        log.error(ex.getMessage(), ex);
         Map<String, String> error = new HashMap<>();
         error.put("error", ex.getReason());
         return new ResponseEntity<>(error, ex.getStatusCode());
@@ -27,6 +30,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(MongoWriteException.class)
     public ResponseEntity<Map<String, String>> handleMongoWriteException(
             MongoWriteException exception) {
+        log.error(exception.getMessage(), exception);
         Map<String, String> error = new HashMap<>();
         ResponseStatusException ex = translateMongoException(exception);
         error.put("error", ex.getReason());
