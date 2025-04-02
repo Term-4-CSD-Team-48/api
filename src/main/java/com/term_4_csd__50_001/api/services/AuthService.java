@@ -41,8 +41,8 @@ public class AuthService {
             builder = builder.emailVerificationToken(emailVerificationToken);
         }
         User user = builder.build();
-        sendVerificationEmail(emailVerificationToken, email);
         userCollection.insertOne(user);
+        sendVerificationEmail(emailVerificationToken, email);
     }
 
     private void sendVerificationEmail(String token, String email) {
