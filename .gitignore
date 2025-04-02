@@ -42,3 +42,5 @@ out/
 
 ### logs ###
 logs/
+
+service-account-key.json
