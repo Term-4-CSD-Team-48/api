@@ -69,12 +69,14 @@ public class AiService {
     public void observe(String jSessionId) {
         if (!isAiServerHealthy())
             throw new ServiceUnavailableException("AI server is down");
-        if (jSessionId.equals(ownerJSessionId))
-            return;
         if (!ownerJSessionId.isBlank())
-            throw new ConflictException("Someone else already observing");
+            if (!jSessionId.equals(ownerJSessionId)) {
+                throw new ConflictException("Someone else already observing");
+            } else {
+                return;
+            }
         try {
-            URI uri = new URI("http", null, AI_INFERENCE_IP_ADDRESS, 8080, "/prompt", null, null);
+            URI uri = new URI("http", null, AI_INFERENCE_IP_ADDRESS, 8080, "/observe", null, null);
             URL url = uri.toURL();
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("POST");
@@ -88,7 +90,7 @@ public class AiService {
                 os.write(input, 0, input.length);
             }
             int code = connection.getResponseCode();
-            log.info("Received response code {} from /prompt", code);
+            log.info("Received response code {} from /observe", code);
             switch (code) {
                 case 400:
                     throw new InternalServerErrorException(
