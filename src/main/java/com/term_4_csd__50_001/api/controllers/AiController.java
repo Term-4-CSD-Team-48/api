@@ -20,30 +20,30 @@ public class AiController {
     @Autowired
     private AiService aiService;
 
-    @PostMapping("/invocations")
+    @PostMapping("/prompt")
     public void invocations(@RequestBody Map<String, Object> requestBody,
             HttpServletRequest request) {
-        log.info("Received request at /invocations");
+        log.info("Received request at /prompt");
         if (!requestBody.containsKey("x") || !requestBody.containsKey("y")) {
             throw new BadRequestException("x and y need to be both present");
         }
-        double x = (double) requestBody.get("x");
-        double y = (double) requestBody.get("y");
+        float x = ((Number) requestBody.get("x")).floatValue();
+        float y = ((Number) requestBody.get("y")).floatValue();
         String jsessionId = request.getSession(false).getId();
         if (jsessionId.isBlank())
             // Should never happen as this EP is meant to be protected
             throw new InternalServerErrorException("Something went wrong");
-        aiService.invocations(x, y, jsessionId);
+        aiService.prompt(x, y, jsessionId);
     }
 
-    @PostMapping("/assume-control")
-    public void assumeControl(HttpServletRequest request) {
-        log.info("Received request at /assume-control");
+    @PostMapping("/observe")
+    public void observe(HttpServletRequest request) {
+        log.info("Received request at /observe");
         String jsessionId = request.getSession(false).getId();
         if (jsessionId.isBlank())
             // Should never happen as this EP is meant to be protected
             throw new InternalServerErrorException("Something went wrong");
-        aiService.assumeControl(jsessionId);
+        aiService.observe(jsessionId);
     }
 
 }

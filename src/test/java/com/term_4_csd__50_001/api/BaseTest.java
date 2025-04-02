@@ -44,8 +44,8 @@ public class BaseTest {
     final protected byte[] sharedSecretBytes = Base64.getDecoder().decode(sharedSecret);
 
     final protected String aiEP = "/ai";
-    final protected String assumeControlEP = aiEP + "/assume-control";
-    final protected String invocationsEP = aiEP + "/invocations";
+    final protected String observeEP = aiEP + "/observe";
+    final protected String promptEP = aiEP + "/prompt";
 
     final protected String emailVerificationTokenURLParam = "email-verification-token";
 

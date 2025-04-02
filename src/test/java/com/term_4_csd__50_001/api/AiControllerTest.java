@@ -21,13 +21,12 @@ public class AiControllerTest extends BaseTest {
                 authService.register(email, username, rawPassword, true);
 
                 // Should throw 401
-                webTestClient.post().uri(invocationsEP).contentType(MediaType.APPLICATION_JSON)
+                webTestClient.post().uri(promptEP).contentType(MediaType.APPLICATION_JSON)
                                 .bodyValue("{\"x\": 12.3, \"y\": 45.6}").exchange().expectStatus()
                                 .isUnauthorized();
 
                 // Should throw 401
-                webTestClient.post().uri(assumeControlEP).exchange().expectStatus()
-                                .isUnauthorized();
+                webTestClient.post().uri(observeEP).exchange().expectStatus().isUnauthorized();
 
                 // Login with correct credentials
                 HttpHeaders headers = webTestClient.post().uri(loginEP)
@@ -43,11 +42,11 @@ public class AiControllerTest extends BaseTest {
                 System.out.println("Extracted JSESSIONID: " + jSessionId);
 
                 // Should return 503 (test is meant to run without AI server)
-                webTestClient.post().uri(assumeControlEP).cookie(jSessionIdCookieName, jSessionId)
+                webTestClient.post().uri(observeEP).cookie(jSessionIdCookieName, jSessionId)
                                 .exchange().expectStatus().isEqualTo(503);
 
                 // Should throw 503 (test is meant to run without AI server)
-                webTestClient.post().uri(invocationsEP).contentType(MediaType.APPLICATION_JSON)
+                webTestClient.post().uri(promptEP).contentType(MediaType.APPLICATION_JSON)
                                 .bodyValue("{\"x\": 12.3, \"y\": 45.6}")
                                 .cookie(jSessionIdCookieName, jSessionId).exchange().expectStatus()
                                 .isEqualTo(503);

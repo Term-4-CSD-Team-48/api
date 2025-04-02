@@ -36,17 +36,15 @@ public class AiService {
         pingAiServerRegularly();
     }
 
-    public void invocations(double x, double y, String jSessionId) {
+    public void prompt(float x, float y, String jSessionId) {
         if (!isAiServerHealthy())
             throw new ServiceUnavailableException("AI server is down");
         if (ownerJSessionId.isBlank())
-            throw new UnauthorizedRequestException(
-                    "Please assume control of the AI at /assume-control");
+            throw new UnauthorizedRequestException("Please observe AI at /observe");
         if (jSessionId != ownerJSessionId)
-            throw new ForbiddenException("Someone else already assumed control");
+            throw new ForbiddenException("Someone else already observing");
         try {
-            URI uri = new URI("http", null, AI_INFERENCE_IP_ADDRESS, 8080, "/invocations", null,
-                    null);
+            URI uri = new URI("http", null, AI_INFERENCE_IP_ADDRESS, 8080, "/prompt", null, null);
             URL url = uri.toURL();
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("POST");
@@ -56,7 +54,7 @@ public class AiService {
                 os.write(input, 0, input.length);
             }
             int code = connection.getResponseCode();
-            log.info(String.format("Received response code %d from /invocations", code));
+            log.info(String.format("Received response code %d from /prompt", code));
             switch (code) {
                 case 200:
                     return;
@@ -68,16 +66,15 @@ public class AiService {
         }
     }
 
-    public void assumeControl(String jSessionId) {
+    public void observe(String jSessionId) {
         if (!isAiServerHealthy())
             throw new ServiceUnavailableException("AI server is down");
         if (jSessionId.equals(ownerJSessionId))
             return;
         if (!ownerJSessionId.isBlank())
-            throw new ConflictException("Someone else already assumed control");
+            throw new ConflictException("Someone else already observing");
         try {
-            URI uri =
-                    new URI("http", null, AI_INFERENCE_IP_ADDRESS, 8080, "/set-owner", null, null);
+            URI uri = new URI("http", null, AI_INFERENCE_IP_ADDRESS, 8080, "/prompt", null, null);
             URL url = uri.toURL();
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("POST");
@@ -91,7 +88,7 @@ public class AiService {
                 os.write(input, 0, input.length);
             }
             int code = connection.getResponseCode();
-            log.info("Received response code {} from /set-owner", code);
+            log.info("Received response code {} from /prompt", code);
             switch (code) {
                 case 400:
                     throw new InternalServerErrorException(
