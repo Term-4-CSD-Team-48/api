@@ -17,8 +17,11 @@ import com.mongodb.MongoWriteException;
 import com.term_4_csd__50_001.api.collections.UserCollection;
 import com.term_4_csd__50_001.api.exceptions.ConflictException;
 import com.term_4_csd__50_001.api.models.User;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Configuration
 @EnableWebSecurity
 public class SecurityConfiguration {
@@ -55,7 +58,17 @@ public class SecurityConfiguration {
                                                         response.getWriter().flush();
                                                 }).usernameParameter("email"))
                                 .exceptionHandling(exception -> exception
-                                                .authenticationEntryPoint((_, res, _) -> {
+                                                .authenticationEntryPoint((req, res, _) -> {
+                                                        if (req.getCookies() != null) {
+                                                                for (Cookie cookie : req
+                                                                                .getCookies()) {
+                                                                        log.info("Cookie Name: {}, Cookie Value: {}",
+                                                                                        cookie.getName(),
+                                                                                        cookie.getValue());
+                                                                }
+                                                        } else {
+                                                                log.info("No cookies found in the request");
+                                                        }
                                                         res.setContentType("application/json");
                                                         res.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                                                         res.getWriter().write(
