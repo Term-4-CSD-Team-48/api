@@ -24,7 +24,6 @@ public class AiController {
     @PostMapping("/prompt")
     public void invocations(@RequestBody Map<String, Object> requestBody,
             HttpServletRequest request) {
-        log.info("Received request at /prompt");
         if (!requestBody.containsKey("x") || !requestBody.containsKey("y")) {
             throw new BadRequestException("x and y need to be both present");
         }
@@ -39,7 +38,6 @@ public class AiController {
 
     @PostMapping("/observe")
     public void observe(@RequestBody Map<String, Object> requestBody, HttpServletRequest request) {
-        log.info("Received request at /observe");
         String jsessionId = request.getSession(false).getId();
         if (jsessionId.isBlank())
             // Should never happen as this EP is meant to be protected

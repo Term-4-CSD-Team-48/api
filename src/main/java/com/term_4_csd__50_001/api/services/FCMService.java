@@ -37,7 +37,7 @@ public class FCMService {
         } catch (FirebaseMessagingException e) {
             throw new InternalServerErrorException(e.getMessage(), e);
         }
-        System.out.println("Sent message: " + response);
+        log.info("Sent message: " + response);
     }
 
 }

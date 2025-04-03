@@ -7,8 +7,10 @@ import com.term_4_csd__50_001.api.Dotenv;
 import com.term_4_csd__50_001.api.exceptions.InternalServerErrorException;
 import jakarta.mail.*;
 import jakarta.mail.internet.*;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
+@Slf4j
 public class MailService {
 
     private Session session;
@@ -34,6 +36,7 @@ public class MailService {
         try {
             Message message = mailBuilder.build(session, mailUsername);
             Transport.send(message);
+            log.info("Sent email");
         } catch (MessagingException e) {
             throw new InternalServerErrorException("Something went wrong sending email", e);
         }

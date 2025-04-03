@@ -1,10 +1,13 @@
 package com.term_4_csd__50_001.api.services;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -125,6 +128,34 @@ public class AiService {
                 objectOnScreen ? "Parcel is being tracked" : "Parcel is not being tracked");
     }
 
+    private void pingAiServer() throws URISyntaxException, MalformedURLException, IOException {
+        URI uri = new URI("http", null, AI_INFERENCE_IP_ADDRESS, 8080, "/ping", null, null);
+        URL url = uri.toURL();
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        connection.setRequestMethod("GET");
+        int code = connection.getResponseCode();
+        if (code == 200) {
+            try (BufferedReader reader =
+                    new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
+                StringBuilder response = new StringBuilder();
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    response.append(line);
+                }
+                String body = response.toString();
+                log.info("When pinged AI server, it responded with body " + body);
+                if ("healthy".equals(body)) {
+                    setAiServerHealthy(true);
+                } else {
+                    setAiServerHealthy(false);
+                }
+            }
+        } else {
+            log.error("AI server responded with code " + code + " when pinged");
+            setAiServerHealthy(false);
+        }
+    }
+
     private void pingAiServerRegularly() {
         if (isPingingAiServer())
             throw new ConflictException("Already pinging AI server");
@@ -132,41 +163,16 @@ public class AiService {
         executorService.submit(() -> {
             while (true) {
                 try {
-                    URI uri = new URI("http", null, AI_INFERENCE_IP_ADDRESS, 8080, "/ping", null,
-                            null);
-                    URL url = uri.toURL();
-                    HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-                    connection.setRequestMethod("GET");
-                    int code = connection.getResponseCode();
-                    if (code == 200) {
-                        try (BufferedReader reader = new BufferedReader(
-                                new InputStreamReader(connection.getInputStream()))) {
-                            StringBuilder response = new StringBuilder();
-                            String line;
-                            while ((line = reader.readLine()) != null) {
-                                response.append(line);
-                            }
-                            String body = response.toString();
-                            log.info("When pinged AI server, it responded with body " + body);
-                            if ("healthy".equals(body)) {
-                                setAiServerHealthy(true);
-                            } else {
-                                setAiServerHealthy(false);
-                            }
-                        }
-                    } else {
-                        log.error("AI server responded with code " + code + " when pinged");
-                        setAiServerHealthy(false);
-                    }
+                    pingAiServer();
                     Thread.sleep(1000 * 60); // Wait before checking again
                 } catch (InterruptedException e) {
                     setPingingAiServer(false);
                     setAiServerHealthy(false);
-                    log.info("Subscription thread interrupted");
+                    log.info("Ping AI server thread interrupted");
                     Thread.currentThread().interrupt();
                 } catch (Exception e) {
                     setAiServerHealthy(false);
-                    log.error("Error in subscription thread: " + e.getMessage());
+                    log.error("Error in ping AI server thread: " + e.getMessage());
                     Thread.sleep(1000 * 60); // Wait before checking again
                 }
             }

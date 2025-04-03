@@ -39,7 +39,6 @@ public class AuthController {
 
     @PostMapping("/logout")
     public void logout(HttpServletRequest request) {
-        log.info("Received request at /logout");
         HttpSession session = request.getSession(false);
         if (session != null) {
             session.invalidate();
@@ -49,7 +48,6 @@ public class AuthController {
 
     @PostMapping("/unregister")
     public void unregister(HttpServletRequest request) {
-        log.info("Received request at /unregister");
         HttpSession session = request.getSession(false);
         Object principal = session.getAttribute("SPRING_SECURITY_CONTEXT");
         Authentication authentication = ((SecurityContextImpl) principal).getAuthentication();
@@ -62,11 +60,11 @@ public class AuthController {
 
     @PostMapping("/register")
     public void register(HttpServletRequest request) {
-        log.info("Received request at /register");
         String email = request.getParameter("email");
         String username = request.getParameter("username");
         String rawPassword = request.getParameter("password");
-        log.debug(String.format("Obtained fields for\nEmail: %s\nUsername: %s\nPassword: %s", email,
+        log.debug(String.format(
+                "At /register obtained fields for\nEmail: %s\nUsername: %s\nPassword: %s", email,
                 username, (rawPassword != null && !rawPassword.isEmpty()) ? "[RAWPASSWORD RECEIVED]"
                         : "[RAWPASSWORD EMPTY OR NULL]"));
         authService.register(email, username, rawPassword);
