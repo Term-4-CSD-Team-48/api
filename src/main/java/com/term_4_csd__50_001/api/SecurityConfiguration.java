@@ -27,7 +27,7 @@ import lombok.extern.slf4j.Slf4j;
 public class SecurityConfiguration {
 
         private static final String[] PUBLIC_URLS =
-                        {"/auth/login", "/auth/register", "/auth/verify-email"};
+                        {"/auth/login", "/auth/register", "/auth/verify-email", "/ai/on-update"};
 
         @Bean
         public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
