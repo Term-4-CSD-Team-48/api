@@ -52,9 +52,11 @@ public class AiService {
             URL url = uri.toURL();
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("POST");
+            connection.setDoOutput(true);
+            connection.setRequestProperty("Content-Type", "application/json");
             String jsonInputString = String.format("{\"x\": %f, \"y\": %f}", x, y);
             try (OutputStream os = connection.getOutputStream()) {
-                byte[] input = jsonInputString.getBytes();
+                byte[] input = jsonInputString.getBytes("utf-8");
                 os.write(input, 0, input.length);
             }
             int code = connection.getResponseCode();
@@ -119,7 +121,7 @@ public class AiService {
     public void onUpdate(Boolean objectOnScreen) {
         if (observerFCMToken.isBlank())
             throw new InternalServerErrorException("No FCM token to push");
-        fcmService.sendNotifcation(observerFCMToken, "Parcel status",
+        fcmService.sendNotifcation(observerFCMToken, "Status update",
                 objectOnScreen ? "Parcel is being tracked" : "Parcel is not being tracked");
     }
 
