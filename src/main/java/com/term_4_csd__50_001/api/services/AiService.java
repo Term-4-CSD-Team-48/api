@@ -25,10 +25,14 @@ public class AiService {
     private final String AI_INFERENCE_IP_ADDRESS;
     private final ExecutorService executorService = Executors.newSingleThreadExecutor();
 
+    @Autowired
+    private FCMService fcmService;
+
     private volatile boolean pingingAiServer = false;
     private volatile boolean aiServerHealthy = false;
 
-    private String ownerJSessionId = "";
+    private String observerJSessionId = "";
+    private String observerFCMToken = "";
 
     @Autowired
     public AiService(Dotenv dotenv) {
@@ -39,9 +43,9 @@ public class AiService {
     public void prompt(float x, float y, String jSessionId) {
         if (!isAiServerHealthy())
             throw new ServiceUnavailableException("AI server is down");
-        if (ownerJSessionId.isBlank())
+        if (observerJSessionId.isBlank())
             throw new UnauthorizedRequestException("Please observe AI at /observe");
-        if (jSessionId != ownerJSessionId)
+        if (jSessionId != observerJSessionId)
             throw new ForbiddenException("Someone else already observing");
         try {
             URI uri = new URI("http", null, AI_INFERENCE_IP_ADDRESS, 8080, "/prompt", null, null);
@@ -67,11 +71,11 @@ public class AiService {
         }
     }
 
-    public void observe(String jSessionId) {
+    public void observe(String jSessionId, String fcmToken) {
         if (!isAiServerHealthy())
             throw new ServiceUnavailableException("AI server is down");
-        if (!ownerJSessionId.isBlank())
-            if (!jSessionId.equals(ownerJSessionId)) {
+        if (!observerJSessionId.isBlank())
+            if (!jSessionId.equals(observerJSessionId)) {
                 throw new ConflictException("Someone else already observing");
             } else {
                 return;
@@ -100,16 +104,23 @@ public class AiService {
                     throw new InternalServerErrorException(
                             "AI server misclassified API as outsider");
                 case 200:
-                    ownerJSessionId = jSessionId;
+                    observerFCMToken = fcmToken;
+                    observerJSessionId = jSessionId;
                     return;
                 default:
                     throw new InternalServerErrorException(
                             "An unknown error occured in sending request to AI server");
             }
         } catch (Exception e) {
-            log.error(e.getMessage(), e);
             throw new InternalServerErrorException("Could not communicate with AI server", e);
         }
+    }
+
+    public void onUpdate(Boolean objectOnScreen) {
+        if (observerFCMToken.isBlank())
+            throw new InternalServerErrorException("No FCM token to push");
+        fcmService.sendNotifcation(observerFCMToken, "Parcel status",
+                objectOnScreen ? "Parcel is being tracked" : "Parcel is not being tracked");
     }
 
     private void pingAiServerRegularly() {
