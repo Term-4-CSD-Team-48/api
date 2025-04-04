@@ -23,7 +23,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
-public class AiService {
+public class AIService {
 
     private final String AI_INFERENCE_IP_ADDRESS;
     private final ExecutorService executorService = Executors.newSingleThreadExecutor();
@@ -38,7 +38,7 @@ public class AiService {
     private String observerFCMToken = "";
 
     @Autowired
-    public AiService(Dotenv dotenv) {
+    public AIService(Dotenv dotenv) {
         AI_INFERENCE_IP_ADDRESS = dotenv.get(Dotenv.AI_INFERENCE_IP_ADDRESS);
         pingAiServerRegularly();
     }

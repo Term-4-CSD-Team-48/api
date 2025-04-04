@@ -9,17 +9,17 @@ import org.springframework.web.bind.annotation.RestController;
 import com.term_4_csd__50_001.api.exceptions.BadRequestException;
 import com.term_4_csd__50_001.api.exceptions.ForbiddenException;
 import com.term_4_csd__50_001.api.exceptions.InternalServerErrorException;
-import com.term_4_csd__50_001.api.services.AiService;
+import com.term_4_csd__50_001.api.services.AIService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @RestController
 @RequestMapping("/ai")
-public class AiController {
+public class AIController {
 
     @Autowired
-    private AiService aiService;
+    private AIService aiService;
 
     @PostMapping("/prompt")
     public void invocations(@RequestBody Map<String, Object> requestBody,
