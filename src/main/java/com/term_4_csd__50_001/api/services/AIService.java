@@ -46,10 +46,10 @@ public class AIService {
     public void prompt(float x, float y, String jSessionId) {
         if (!isAiServerHealthy())
             throw new ServiceUnavailableException("AI server is down");
-        if (observerJSessionId.isBlank())
-            throw new UnauthorizedRequestException("Please observe AI at /observe");
-        if (jSessionId != observerJSessionId)
-            throw new ForbiddenException("Someone else already observing");
+        // if (observerJSessionId.isBlank())
+        // throw new UnauthorizedRequestException("Please observe AI at /observe");
+        // if (jSessionId != observerJSessionId)
+        // throw new ForbiddenException("Someone else already observing");
         try {
             URI uri = new URI("http", null, AI_INFERENCE_IP_ADDRESS, 8080, "/prompt", null, null);
             URL url = uri.toURL();
@@ -79,12 +79,12 @@ public class AIService {
     public void observe(String jSessionId, String fcmToken) {
         if (!isAiServerHealthy())
             throw new ServiceUnavailableException("AI server is down");
-        if (!observerJSessionId.isBlank())
-            if (!jSessionId.equals(observerJSessionId)) {
-                throw new ConflictException("Someone else already observing");
-            } else {
-                return;
-            }
+        // if (!observerJSessionId.isBlank())
+        // if (!jSessionId.equals(observerJSessionId)) {
+        // throw new ConflictException("Someone else already observing");
+        // } else {
+        // return;
+        // }
         try {
             URI uri = new URI("http", null, AI_INFERENCE_IP_ADDRESS, 8080, "/observe", null, null);
             URL url = uri.toURL();
@@ -135,8 +135,7 @@ public class AIService {
         connection.setRequestMethod("GET");
         int code = connection.getResponseCode();
         if (code == 200) {
-            try (BufferedReader reader =
-                    new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
                 StringBuilder response = new StringBuilder();
                 String line;
                 while ((line = reader.readLine()) != null) {
