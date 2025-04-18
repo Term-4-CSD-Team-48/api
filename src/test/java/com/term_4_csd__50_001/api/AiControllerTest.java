@@ -1,5 +1,6 @@
 package com.term_4_csd__50_001.api;
 
+import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -43,7 +44,8 @@ public class AiControllerTest extends BaseTest {
 
                 // Should return 503 (test is meant to run without AI server)
                 webTestClient.post().uri(observeEP).cookie(jSessionIdCookieName, jSessionId)
-                                .exchange().expectStatus().isEqualTo(503);
+                                .bodyValue(Map.of("token", "token")).exchange().expectStatus()
+                                .isEqualTo(503);
 
                 // Should throw 503 (test is meant to run without AI server)
                 webTestClient.post().uri(promptEP).contentType(MediaType.APPLICATION_JSON)

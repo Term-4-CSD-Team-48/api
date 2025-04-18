@@ -2,6 +2,7 @@ package com.term_4_csd__50_001.api.controllers;
 
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -11,6 +12,7 @@ import com.term_4_csd__50_001.api.exceptions.ForbiddenException;
 import com.term_4_csd__50_001.api.exceptions.InternalServerErrorException;
 import com.term_4_csd__50_001.api.services.AIService;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -38,14 +40,17 @@ public class AIController {
 
     @PostMapping("/observe")
     public void observe(@RequestBody Map<String, Object> requestBody, HttpServletRequest request) {
-        String jsessionId = request.getSession(false).getId();
+        HttpSession session = request.getSession(false);
+        String jsessionId = session.getId();
+        String principal = ((SecurityContext) session.getAttribute("SPRING_SECURITY_CONTEXT"))
+                .getAuthentication().getPrincipal().toString();
         if (jsessionId.isBlank())
             // Should never happen as this EP is meant to be protected
             throw new InternalServerErrorException("Something went wrong");
         String fcmToken = (String) requestBody.get("token");
         if (fcmToken.isBlank())
             throw new BadRequestException("need token");
-        aiService.observe(jsessionId, fcmToken);
+        aiService.observe(jsessionId, fcmToken, principal);
     }
 
     @PostMapping("/on-update")
