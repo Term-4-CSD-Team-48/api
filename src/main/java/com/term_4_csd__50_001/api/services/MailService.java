@@ -18,18 +18,23 @@ public class MailService {
 
     @Autowired
     public MailService(Dotenv dotenv) {
-        Properties props = new Properties();
-        props.put("mail.smtp.auth", dotenv.get(Dotenv.MAIL_SMTP_AUTH));
-        props.put("mail.smtp.starttls.enable", dotenv.get(Dotenv.MAIL_SMTP_STARTTLS));
-        props.put("mail.smtp.host", dotenv.get(Dotenv.MAIL_HOST));
-        props.put("mail.smtp.port", dotenv.get(Dotenv.MAIL_PORT));
-        this.mailUsername = dotenv.get(Dotenv.MAIL_USERNAME);
-        Session session = Session.getInstance(props, new Authenticator() {
-            protected PasswordAuthentication getPasswordAuthentication() {
-                return new PasswordAuthentication(mailUsername, dotenv.get(Dotenv.MAIL_PASSWORD));
-            }
-        });
-        this.session = session;
+        try {
+            Properties props = new Properties();
+            props.put("mail.smtp.auth", dotenv.get(Dotenv.MAIL_SMTP_AUTH));
+            props.put("mail.smtp.starttls.enable", dotenv.get(Dotenv.MAIL_SMTP_STARTTLS));
+            props.put("mail.smtp.host", dotenv.get(Dotenv.MAIL_HOST));
+            props.put("mail.smtp.port", dotenv.get(Dotenv.MAIL_PORT));
+            this.mailUsername = dotenv.get(Dotenv.MAIL_USERNAME);
+            Session session = Session.getInstance(props, new Authenticator() {
+                protected PasswordAuthentication getPasswordAuthentication() {
+                    return new PasswordAuthentication(mailUsername,
+                            dotenv.get(Dotenv.MAIL_PASSWORD));
+                }
+            });
+            this.session = session;
+        } catch (Exception e) {
+            log.warn("MailService cannot send mail");
+        }
     }
 
     public void sendMail(MailBuilder mailBuilder) {
