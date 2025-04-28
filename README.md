@@ -4,7 +4,7 @@
 
 ### Running the Application
 
-.env file needs to be present in root. Keys that start with MAIL are optional as they only affect the mail sending capabilities of the server. For MONGO_CONNECTION_STRING you are welcome to use the default provided as it is just a free database with no sensitive information.
+.env file needs to be present in root. Keys that start with MAIL are optional and can be absent as they only affect the mail sending capabilities of the server. For MONGO_CONNECTION_STRING you are welcome to use the default provided as it is just a free database with no sensitive information.
 
 AI_SERVER_URL=  
 MAIL_HOST=  
