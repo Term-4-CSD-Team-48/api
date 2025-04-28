@@ -145,8 +145,11 @@ public class AIService {
     }
 
     private void pingAiServer() throws URISyntaxException, MalformedURLException, IOException {
-        URI uri = new URI("http", null, AI_SERVER_URL, 8080, "/ping", null, null);
-        URL url = uri.toURL();
+        URI baseUri = new URI(AI_SERVER_URL); // Parse the AI_SERVER_URL into a URI object
+        URI uri = new URI(baseUri.getScheme(), null, baseUri.getHost(), baseUri.getPort(), "/ping",
+                null, null); // Use the components of the baseUri to construct the
+                             // new URI
+        URL url = uri.toURL(); // Convert the URI to a URL
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestMethod("GET");
         int code = connection.getResponseCode();
