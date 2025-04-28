@@ -25,7 +25,7 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 public class AIService {
 
-    private final String AI_INFERENCE_IP_ADDRESS;
+    private final String AI_SERVER_URL;
     private final ExecutorService executorService = Executors.newSingleThreadExecutor();
 
     @Autowired
@@ -40,7 +40,7 @@ public class AIService {
 
     @Autowired
     public AIService(Dotenv dotenv) {
-        AI_INFERENCE_IP_ADDRESS = dotenv.get(Dotenv.AI_INFERENCE_IP_ADDRESS);
+        AI_SERVER_URL = dotenv.get(Dotenv.AI_SERVER_URL);
         pingAiServerRegularly();
     }
 
@@ -52,8 +52,11 @@ public class AIService {
         if (jSessionId != observerJSessionId)
             throw new ForbiddenException("Someone else already observing");
         try {
-            URI uri = new URI("http", null, AI_INFERENCE_IP_ADDRESS, 8080, "/prompt", null, null);
-            URL url = uri.toURL();
+            URI baseUri = new URI(AI_SERVER_URL); // Parse the AI_SERVER_URL into a URI object
+            URI uri = new URI(baseUri.getScheme(), null, baseUri.getHost(), baseUri.getPort(),
+                    "/prompt", null, null); // Use the components of the baseUri to construct the
+                                            // new URI
+            URL url = uri.toURL(); // Convert the URI to a URL
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("POST");
             connection.setDoOutput(true);
@@ -95,8 +98,11 @@ public class AIService {
             }
         }
         try {
-            URI uri = new URI("http", null, AI_INFERENCE_IP_ADDRESS, 8080, "/observe", null, null);
-            URL url = uri.toURL();
+            URI baseUri = new URI(AI_SERVER_URL); // Parse AI_SERVER_URL into a URI object
+            URI uri = new URI(baseUri.getScheme(), null, baseUri.getHost(), baseUri.getPort(),
+                    "/observe", null, null); // Use the components of baseUri to construct the new
+                                             // URI
+            URL url = uri.toURL(); // Convert the URI to a URL
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("POST");
             connection.setDoOutput(true); // Enable output for the connection
@@ -139,7 +145,7 @@ public class AIService {
     }
 
     private void pingAiServer() throws URISyntaxException, MalformedURLException, IOException {
-        URI uri = new URI("http", null, AI_INFERENCE_IP_ADDRESS, 8080, "/ping", null, null);
+        URI uri = new URI("http", null, AI_SERVER_URL, 8080, "/ping", null, null);
         URL url = uri.toURL();
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestMethod("GET");

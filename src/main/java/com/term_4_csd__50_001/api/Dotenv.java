@@ -13,7 +13,7 @@ public class Dotenv {
 
     private io.github.cdimascio.dotenv.Dotenv dotenv;
 
-    public static final String AI_INFERENCE_IP_ADDRESS = "AI_INFERENCE_IP_ADDRESS";
+    public static final String AI_SERVER_URL = "AI_SERVER_URL";
     public static final String MONGO_CONNECTION_STRING = "MONGO_CONNECTION_STRING";
     public static final String MAIL_HOST = "MAIL_HOST";
     public static final String MAIL_PORT = "MAIL_PORT";

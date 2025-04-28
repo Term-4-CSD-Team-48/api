@@ -6,7 +6,7 @@
 
 .env file needs to be present in root. Keys that start with MAIL are optional as they only affect the mail sending capabilities of the server. For MONGO_CONNECTION_STRING you are welcome to use the default provided as it is just a free database with no sensitive information.
 
-AI_INFERENCE_IP_ADDRESS=  
+AI_SERVER_URL=  
 MAIL_HOST=  
 MAIL_PORT=  
 MAIL_USERNAME=  
@@ -15,7 +15,7 @@ MAIL_SMTP_AUTH=true
 MAIL_SMTP_STARTTLS=true  
 MONGO_CONNECTION_STRING=mongodb+srv://xyfoco:09bCP5iyIakm7UTt@cluster0.hacfvzo.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
 
-AI_INFERENCE_IP_ADDRESS should be 127.0.0.1 if the AI server is being hosted on
+AI_SERVER_URL should be http://127.0.0.1:8080 if the AI server is being hosted on
 the same machine.
 
 MAIL_HOST should be smtp.gmail.com if gmail  
