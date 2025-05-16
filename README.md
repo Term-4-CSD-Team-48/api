@@ -13,7 +13,7 @@ MAIL_USERNAME=
 MAIL_PASSWORD=  
 MAIL_SMTP_AUTH=true  
 MAIL_SMTP_STARTTLS=true  
-MONGO_CONNECTION_STRING=mongodb+srv://xyfoco:09bCP5iyIakm7UTt@cluster0.hacfvzo.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
+MONGO_CONNECTION_STRING=
 
 AI_SERVER_URL should be http://127.0.0.1:8080 if the AI server is being hosted on
 the same machine.
@@ -23,7 +23,7 @@ MAIL_PORT should be 587 if gmail
 MAIL_USERNAME should be email like example@gmail.com  
 MAIL_PASSWORD should be app password for the email and can be obtained here https://www.myaccount.google.com/apppasswords if gmail
 
-MONGO_CONNECTION_STRING should be obtained by heading to https://www.mongodb.com and creating a free cluster. There should be a "Connect" button and click on "Drivers" to get the connection string. Feel free to use the one i provided as it's free and has no sensitive information
+MONGO_CONNECTION_STRING should be obtained by heading to https://www.mongodb.com and creating a free cluster. There should be a "Connect" button and click on "Drivers" to get the connection string.
 
 To host the server on port 80 run the command below. The API server can be run on any port and it can still integrate with the AI as long as you let the AI know which port is the API running on. The API by default runs on port 8080 if you don't specify --args
 
